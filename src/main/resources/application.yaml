@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: product-storage-api
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: ${PWD_POSTGRES}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+
+server:
+  port: 8080
+  servlet:
+    context-path: /app
