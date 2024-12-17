@@ -6,8 +6,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
 
-    <include file="task-0/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="task-1/changelog.xml" relativeToChangelogFile="true"/>
+    <include file="products-insert-script.xml" relativeToChangelogFile="true"/>
 
-    </databaseChangeLog>
-
+    <changeSet id="task-1" author="Rustamscode">
+        <tagDatabase tag="task-1"/>
+    </changeSet>
+</databaseChangeLog>

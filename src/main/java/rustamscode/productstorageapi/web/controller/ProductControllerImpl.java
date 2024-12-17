@@ -1,10 +1,6 @@
 package rustamscode.productstorageapi.web.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -12,18 +8,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import rustamscode.productstorageapi.exception.NonUniqueProductNumberException;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
+import rustamscode.productstorageapi.service.ProductService;
 import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
+import rustamscode.productstorageapi.service.dto.ImmutableProductFilterDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
 import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
 import rustamscode.productstorageapi.web.dto.ProductDataResponse;
+import rustamscode.productstorageapi.web.dto.ProductFilterRequest;
 import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
-import rustamscode.productstorageapi.service.ProductService;
 
 import java.util.UUID;
 
@@ -32,14 +28,12 @@ import java.util.UUID;
  * Endpoints fot creating, reading, reading all, updating, and deleting products.
  */
 
-@Tag(name = "Product management API")
 @Slf4j
-@Validated
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/products")
+@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE) //TODO Хорошо ли здесь использовать @Value?
-public class ProductControllerImpl implements ProductController{
+public class ProductControllerImpl implements ProductController {
     /**
      * Service layer for product-management business logic
      */
@@ -56,15 +50,12 @@ public class ProductControllerImpl implements ProductController{
      * @param productCreateRequest the request containing the details to create the product
      * @return the unique identifier of the created product
      * @throws IllegalArgumentException if the provided request is null
-     * @throws ValidationException if the provided request is not valid
+     * @throws ValidationException      if the provided request is not valid
      */
     @Override
-    @PostMapping
-    @Operation(summary = "Create a product")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UUID create(@Valid @NotNull @RequestBody final ProductCreateRequest productCreateRequest) {
-        return productService.create(conversionService.convert(productCreateRequest,
-                ImmutableProductCreateDetails.class));
+    public UUID create(final ProductCreateRequest productCreateRequest) {
+        return productService
+                .create(conversionService.convert(productCreateRequest, ImmutableProductCreateDetails.class));
     }
 
     /**
@@ -76,9 +67,7 @@ public class ProductControllerImpl implements ProductController{
      * @throws ProductNotFoundException if no product is found with the given id
      */
     @Override
-    @Operation(summary = "Find a product by ID")
-    @GetMapping("/{id}")
-    public ProductDataResponse findById(@PathVariable final UUID id) {
+    public ProductDataResponse findById(final UUID id) {
         return conversionService.convert(productService.findById(id), ProductDataResponse.class);
     }
 
@@ -89,31 +78,27 @@ public class ProductControllerImpl implements ProductController{
      * @return a {@link Page} of {@link ProductDataResponse} representing the products
      */
     @Override
-    @Operation(summary = "Find all products")
-    @GetMapping
-    public Page<ProductDataResponse> findAll(@PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable) {
-        return productService.findAll(pageable)
+    public Page<ProductDataResponse> findAll(Pageable pageable) {
+        return productService
+                .findAll(pageable)
                 .map(productData -> conversionService.convert(productData, ProductDataResponse.class));
     }
 
     /**
      * Updates an existing product with the provided details.
      *
-     * @param id the ID of the product to be updated
+     * @param id                   the ID of the product to be updated
      * @param productUpdateRequest the request containing the details to update the product
      * @return the ID of the updated product
-     * @throws IllegalArgumentException if the provided id or request is null
-     * @throws ValidationException if the provided request is not valid
-     * @throws ProductNotFoundException if no product is found with the given id
+     * @throws IllegalArgumentException        if the provided id or request is null
+     * @throws ValidationException             if the provided request is not valid
+     * @throws ProductNotFoundException        if no product is found with the given id
      * @throws NonUniqueProductNumberException if the new product number is not unique
      */
     @Override
-    @Operation(summary = "Update a product")
-    @PutMapping("/{id}")
-    public UUID update(@PathVariable final UUID id,
-                       @Valid @NotNull @RequestBody final ProductUpdateRequest productUpdateRequest) {
-        return productService.update(id, conversionService.convert(productUpdateRequest,
-                ImmutableProductUpdateDetails.class));
+    public UUID update(final UUID id, final ProductUpdateRequest productUpdateRequest) {
+        return productService
+                .update(id, conversionService.convert(productUpdateRequest, ImmutableProductUpdateDetails.class));
     }
 
     /**
@@ -124,10 +109,22 @@ public class ProductControllerImpl implements ProductController{
      * @throws ProductNotFoundException if no product is found with the given id
      */
     @Override
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a product")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final UUID id) {
+    public void delete(final UUID id) {
         productService.delete(id);
     }
+
+    /**
+     * Finds products with applied filters
+     *
+     * @param filterRequest DTO for filter
+     * @return list of filtered products
+     */
+    @Override
+    public Page<ProductDataResponse> searchProducts(ProductFilterRequest filterRequest) {
+        return productService
+                .searchProducts(conversionService.convert(filterRequest, ImmutableProductFilterDetails.class))
+                .map(productData -> conversionService.convert(productData, ProductDataResponse.class));
+    }
+
+
 }

@@ -4,23 +4,17 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
-import rustamscode.productstorageapi.persistance.entity.product.Category;
-
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-/**
- * Request object for updating an existing product.
- */
-
 @Value
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ImmutableProductUpdateDetails {
-    BigInteger productNumber;
-    String info;
-    Category category;
+public class ImmutableProductFilterDetails {
+    String name;
     BigDecimal price;
-    BigDecimal amount;
+    BigInteger amount;
+    Integer page;
+    Integer size;
 }
