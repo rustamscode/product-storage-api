@@ -2,7 +2,7 @@ package rustamscode.productstorageapi.conversion;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import rustamscode.productstorageapi.persistance.entity.product.ProductEntity;
+import rustamscode.productstorageapi.persistance.entity.ProductEntity;
 import rustamscode.productstorageapi.service.dto.ProductData;
 
 

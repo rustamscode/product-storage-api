@@ -3,13 +3,15 @@ package rustamscode.productstorageapi.config;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import rustamscode.productstorageapi.service.dto.ErrorDetails;
 import rustamscode.productstorageapi.exception.NonUniqueProductNumberException;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
+import rustamscode.productstorageapi.exception.UnsupportedOperationTypeException;
+import rustamscode.productstorageapi.service.dto.ErrorDetails;
 
 import static java.util.stream.Collectors.joining;
 
@@ -78,6 +80,30 @@ public class GlobalExceptionHandler {
                 .message(message)
                 .exception(exception.getClass().getSimpleName())
                 .source(className.substring(className.lastIndexOf(".") + 1))
+                .build();
+    }
+
+    @ExceptionHandler(UnsupportedOperationTypeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDetails unsupportedOperationTypeException(UnsupportedOperationTypeException exception) {
+        log.error(exception.getMessage());
+
+        return ErrorDetails.builder()
+                .message(exception.getMessage())
+                .exception(exception.getClass().getSimpleName())
+                .source(exception.getStackTrace()[0].getClassName())
+                .build();
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDetails httpMessageNotReadableException(Exception exception) {
+        log.error(exception.getMessage());
+
+        return ErrorDetails.builder()
+                .message(exception.getMessage())
+                .exception(exception.getClass().getSimpleName())
+                .source(exception.getStackTrace()[0].getClassName())
                 .build();
     }
 

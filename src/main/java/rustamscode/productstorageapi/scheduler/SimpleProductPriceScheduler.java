@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rustamscode.productstorageapi.persistance.entity.product.ProductEntity;
+import rustamscode.productstorageapi.persistance.entity.ProductEntity;
 import rustamscode.productstorageapi.persistance.repository.ProductRepository;
 
 import java.math.BigDecimal;

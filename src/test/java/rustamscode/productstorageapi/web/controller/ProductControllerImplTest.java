@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import rustamscode.productstorageapi.config.GlobalExceptionHandler;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
-import rustamscode.productstorageapi.persistance.entity.product.Category;
+import rustamscode.productstorageapi.persistance.enumeration.Category;
 import rustamscode.productstorageapi.service.ProductService;
 import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;

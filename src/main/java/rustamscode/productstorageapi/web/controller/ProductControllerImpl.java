@@ -12,15 +12,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import rustamscode.productstorageapi.exception.NonUniqueProductNumberException;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
+import rustamscode.productstorageapi.search.criteria.SearchCriteria;
 import rustamscode.productstorageapi.service.ProductService;
 import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
-import rustamscode.productstorageapi.service.dto.ImmutableProductFilterDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
+import rustamscode.productstorageapi.service.dto.ProductData;
 import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
 import rustamscode.productstorageapi.web.dto.ProductDataResponse;
-import rustamscode.productstorageapi.web.dto.ProductFilterRequest;
 import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -78,7 +79,7 @@ public class ProductControllerImpl implements ProductController {
      * @return a {@link Page} of {@link ProductDataResponse} representing the products
      */
     @Override
-    public Page<ProductDataResponse> findAll(Pageable pageable) {
+    public Page<ProductDataResponse> findAll(final Pageable pageable) {
         return productService
                 .findAll(pageable)
                 .map(productData -> conversionService.convert(productData, ProductDataResponse.class));
@@ -114,17 +115,16 @@ public class ProductControllerImpl implements ProductController {
     }
 
     /**
-     * Finds products with applied filters
+     * Searches for a product using criteria list.
      *
-     * @param filterRequest DTO for filter
-     * @return list of filtered products
+     * @param pageable     the pagination information
+     * @param criteriaList the criteria list
+     * @return a {@link Page} of {@link ProductData} representing the products
      */
     @Override
-    public Page<ProductDataResponse> searchProducts(ProductFilterRequest filterRequest) {
+    public Page<ProductDataResponse> search(Pageable pageable, List<SearchCriteria> criteriaList) {
         return productService
-                .searchProducts(conversionService.convert(filterRequest, ImmutableProductFilterDetails.class))
+                .search(pageable, criteriaList)
                 .map(productData -> conversionService.convert(productData, ProductDataResponse.class));
     }
-
-
 }

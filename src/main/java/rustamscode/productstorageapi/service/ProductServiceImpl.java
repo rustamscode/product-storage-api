@@ -7,23 +7,21 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import rustamscode.productstorageapi.exception.NonUniqueProductNumberException;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
-import rustamscode.productstorageapi.persistance.entity.product.ProductEntity;
+import rustamscode.productstorageapi.persistance.entity.ProductEntity;
 import rustamscode.productstorageapi.persistance.repository.ProductRepository;
+import rustamscode.productstorageapi.search.criteria.SearchCriteria;
 import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
-import rustamscode.productstorageapi.service.dto.ImmutableProductFilterDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
 import rustamscode.productstorageapi.service.dto.ProductData;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -95,7 +93,7 @@ public class ProductServiceImpl implements ProductService {
      * @param pageable the pagination information
      * @return a {@link Page} of {@link ProductData} representing the products
      */
-    public Page<ProductData> findAll(Pageable pageable) {
+    public Page<ProductData> findAll(final Pageable pageable) {
         return productRepository.findAll(pageable)
                 .map(product -> conversionService.convert(product, ProductData.class));
     }
@@ -106,6 +104,7 @@ public class ProductServiceImpl implements ProductService {
      * @param id      the ID of the product to be updated
      * @param request the details to update the product with
      * @return the ID of the updated product
+     * @return ID of the updated product
      * @throws IllegalArgumentException        if the provided id or request is null
      * @throws ProductNotFoundException        if no product is found with the given id
      * @throws NonUniqueProductNumberException if the new product number is not unique
@@ -159,29 +158,26 @@ public class ProductServiceImpl implements ProductService {
         log.info("Product deleted with id: {}", id);
     }
 
+    /**
+     * Searches for a product using criteria list.
+     *
+     * @param pageable     the pagination information
+     * @param criteriaList the criteria list
+     * @return a {@link Page} of {@link ProductData} representing the products
+     */
     @Override
-    public Page<ProductData> searchProducts(final ImmutableProductFilterDetails filterDetails) {
-        final PageRequest pageRequest = PageRequest.of(filterDetails.getPage(), filterDetails.getSize());
-
-        final Specification<ProductEntity> specification = (root, query, criteriaBuilder) ->
+    public Page<ProductData> search(Pageable pageable, List<SearchCriteria> criteriaList) {
+        Specification<ProductEntity> specification = (root, query, builder) ->
         {
-            final List<Predicate> predicates = new ArrayList<>();
+            final Predicate[] predicates = criteriaList.stream()
+                    .map(criteria -> criteria.toPredicate(builder, root))
+                    .toArray(Predicate[]::new);
 
-            if (filterDetails.getName() != null) {
-                predicates.add(criteriaBuilder.like(root.get("name"), filterDetails.getName()));
-            }
-            if (filterDetails.getPrice() != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), filterDetails.getPrice()));
-            }
-            if (filterDetails.getAmount() != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("amount"), filterDetails.getAmount()));
-            }
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            return builder.and(predicates);
         };
 
-        return productRepository.findAll(specification, pageRequest)
+        return productRepository.findAll(specification, pageable)
                 .map(product -> conversionService.convert(product, ProductData.class));
-
     }
 
 

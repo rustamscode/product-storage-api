@@ -1,11 +1,15 @@
 package rustamscode.productstorageapi.web.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import rustamscode.productstorageapi.persistance.entity.product.Category;
+import rustamscode.productstorageapi.persistance.enumeration.Category;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
