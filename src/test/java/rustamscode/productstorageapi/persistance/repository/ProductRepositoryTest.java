@@ -1,6 +1,8 @@
 package rustamscode.productstorageapi.persistance.repository;
 
 import jakarta.persistence.criteria.Predicate;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
+import rustamscode.productstorageapi.motherobject.ObjectMother;
 import rustamscode.productstorageapi.persistance.entity.ProductEntity;
 import rustamscode.productstorageapi.persistance.enumeration.Category;
 import rustamscode.productstorageapi.search.criteria.BigDecimalSearchCriteria;
@@ -20,13 +23,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 @ActiveProfiles(value = "test")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 class ProductRepositoryTest {
 
     @Autowired
@@ -36,36 +39,25 @@ class ProductRepositoryTest {
     ProductEntity product2;
     ProductEntity product3;
 
-    UUID productId1;
-    UUID productId2;
-    UUID productId3;
-
     @BeforeEach
     void setup() {
-        productId1 = UUID.randomUUID();
-        productId2 = UUID.randomUUID();
-        productId3 = UUID.randomUUID();
-
-        product1 = ProductEntity.builder()
-                .name("Product1")
-                .productNumber(BigInteger.valueOf(1111))
-                .info("Product1 info")
-                .category(Category.BOOKS)
-                .price(BigDecimal.valueOf(1111))
+        product1 = ObjectMother.productEntity()
+                .withName("Product1")
+                .withProductNumber(BigInteger.valueOf(1111))
+                .withPrice(BigDecimal.valueOf(1111))
+                .withCategory(Category.BOOKS)
                 .build();
-        product2 = ProductEntity.builder()
-                .name("Product2")
-                .productNumber(BigInteger.valueOf(2222))
-                .info("Product2 info")
-                .category(Category.FOOD)
-                .price(BigDecimal.valueOf(2222))
+        product2 = ObjectMother.productEntity()
+                .withName("Product2")
+                .withProductNumber(BigInteger.valueOf(2222))
+                .withPrice(BigDecimal.valueOf(2222))
+                .withCategory(Category.FOOD)
                 .build();
-        product3 = ProductEntity.builder()
-                .name("Product3")
-                .productNumber(BigInteger.valueOf(3333))
-                .info("Product3 info")
-                .category(Category.ELECTRONICS)
-                .price(BigDecimal.valueOf(3333))
+        product3 = ObjectMother.productEntity()
+                .withName("Product3")
+                .withProductNumber(BigInteger.valueOf(3333))
+                .withPrice(BigDecimal.valueOf(3333))
+                .withCategory(Category.ELECTRONICS)
                 .build();
     }
 
@@ -155,7 +147,7 @@ class ProductRepositoryTest {
         underTest.save(product2);
         underTest.save(product3);
 
-        List<SearchCriteria> criteriaList = List.of(
+        final List<SearchCriteria> criteriaList = List.of(
                 StringSearchCriteria.builder()
                         .field("name")
                         .value("Product")
@@ -163,15 +155,15 @@ class ProductRepositoryTest {
                         .build()
         );
 
-        Pageable pageable = PageRequest.of(0, 5);
-        Specification<ProductEntity> specification = (root, query, builder) -> {
+        final Pageable pageable = PageRequest.of(0, 5);
+        final Specification<ProductEntity> specification = (root, query, builder) -> {
             Predicate[] predicates = criteriaList.stream()
                     .map(criteria -> criteria.toPredicate(builder, root))
                     .toArray(Predicate[]::new);
             return builder.and(predicates);
         };
 
-        Page<ProductEntity> filteredProducts = underTest.findAll(specification, pageable);
+        final Page<ProductEntity> filteredProducts = underTest.findAll(specification, pageable);
 
         assertThat(filteredProducts).isNotEmpty();
         assertThat(filteredProducts.getContent().size()).isEqualTo(3);
@@ -196,7 +188,7 @@ class ProductRepositoryTest {
         underTest.save(product2);
         underTest.save(product3);
 
-        List<SearchCriteria> criteriaList = List.of(
+        final List<SearchCriteria> criteriaList = List.of(
                 StringSearchCriteria.builder()
                         .field("name")
                         .value("Product")
@@ -209,15 +201,15 @@ class ProductRepositoryTest {
                         .build()
         );
 
-        Pageable pageable = PageRequest.of(0, 5);
-        Specification<ProductEntity> specification = (root, query, builder) -> {
+        final Pageable pageable = PageRequest.of(0, 5);
+        final Specification<ProductEntity> specification = (root, query, builder) -> {
             Predicate[] predicates = criteriaList.stream()
                     .map(criteria -> criteria.toPredicate(builder, root))
                     .toArray(Predicate[]::new);
             return builder.and(predicates);
         };
 
-        Page<ProductEntity> filteredProducts = underTest.findAll(specification, pageable);
+        final Page<ProductEntity> filteredProducts = underTest.findAll(specification, pageable);
 
         assertThat(filteredProducts).isNotEmpty();
         assertThat(filteredProducts.getContent().size()).isEqualTo(2);

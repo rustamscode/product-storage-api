@@ -57,16 +57,16 @@ class ProductControllerImplTest {
     ObjectMapper objectMapper;
 
     @MockBean
-    private ProductService productService;
+    private ProductService productServiceMock;
 
     @MockBean
-    private FormattingConversionService conversionService;
+    private FormattingConversionService conversionServiceMock;
 
     private static final String BASE_URL = "/products";
 
     @BeforeEach
     void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ProductControllerImpl(productService, conversionService))
+        mockMvc = MockMvcBuilders.standaloneSetup(new ProductControllerImpl(productServiceMock, conversionServiceMock))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -74,7 +74,7 @@ class ProductControllerImplTest {
 
     @Test
     void createShouldReturnCreatedProductIdWhenRequestIsValid() throws Exception {
-        ProductCreateRequest request = ProductCreateRequest.builder()
+        final ProductCreateRequest request = ProductCreateRequest.builder()
                 .name("Product1")
                 .productNumber(BigInteger.valueOf(1111))
                 .info("Test Info")
@@ -82,7 +82,7 @@ class ProductControllerImplTest {
                 .price(BigDecimal.valueOf(1111))
                 .amount(BigDecimal.valueOf(1111))
                 .build();
-        ImmutableProductCreateDetails createDetails = ImmutableProductCreateDetails.builder()
+        final ImmutableProductCreateDetails createDetails = ImmutableProductCreateDetails.builder()
                 .name(request.getName())
                 .productNumber(request.getProductNumber())
                 .info(request.getInfo())
@@ -91,11 +91,11 @@ class ProductControllerImplTest {
                 .amount(request.getAmount())
                 .lastUpdateTime(LocalDateTime.now())
                 .build();
-        UUID createdId = UUID.randomUUID();
+        final UUID createdId = UUID.randomUUID();
 
-        when(conversionService.convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class)))
+        when(conversionServiceMock.convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class)))
                 .thenReturn(createDetails);
-        when(productService.create(createDetails)).thenReturn(createdId);
+        when(productServiceMock.create(createDetails)).thenReturn(createdId);
 
         mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -103,13 +103,13 @@ class ProductControllerImplTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(createdId.toString())));
 
-        verify(conversionService).convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class));
-        verify(productService).create(createDetails);
+        verify(conversionServiceMock).convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class));
+        verify(productServiceMock).create(createDetails);
     }
 
     @Test
     void createShouldReturnExceptionWhenRequestIsInvalid() throws Exception {
-        ProductCreateRequest request = ProductCreateRequest.builder()
+        final ProductCreateRequest request = ProductCreateRequest.builder()
                 .name("Product1")
                 .productNumber(BigInteger.valueOf(1111))
                 .info("Test Info")
@@ -117,8 +117,7 @@ class ProductControllerImplTest {
                 .price(BigDecimal.valueOf(1111))
                 .amount(BigDecimal.valueOf(-1111))
                 .build();
-
-        ImmutableProductCreateDetails createDetails = ImmutableProductCreateDetails.builder()
+        final ImmutableProductCreateDetails createDetails = ImmutableProductCreateDetails.builder()
                 .name(request.getName())
                 .productNumber(request.getProductNumber())
                 .info(request.getInfo())
@@ -128,7 +127,7 @@ class ProductControllerImplTest {
                 .lastUpdateTime(LocalDateTime.now())
                 .build();
 
-        when(conversionService.convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class)))
+        when(conversionServiceMock.convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class)))
                 .thenReturn(createDetails);
 
         mockMvc.perform(post(BASE_URL)
@@ -140,9 +139,8 @@ class ProductControllerImplTest {
 
     @Test
     void findByIdShouldReturnProductDetailsWhenProductExists() throws Exception {
-        UUID id = UUID.randomUUID();
-
-        ProductData productData = ProductData.builder()
+        final UUID id = UUID.randomUUID();
+        final ProductData productData = ProductData.builder()
                 .id(id)
                 .name("Product1")
                 .productNumber(BigInteger.valueOf(1111))
@@ -153,8 +151,7 @@ class ProductControllerImplTest {
                 .lastAmountUpdate(LocalDateTime.now())
                 .creationTime(LocalDate.now())
                 .build();
-
-        ProductDataResponse response = ProductDataResponse.builder()
+        final ProductDataResponse response = ProductDataResponse.builder()
                 .id(productData.getId())
                 .name(productData.getName())
                 .productNumber(productData.getProductNumber())
@@ -166,23 +163,23 @@ class ProductControllerImplTest {
                 .creationTime(productData.getCreationTime())
                 .build();
 
-        when(productService.findById(id)).thenReturn(productData);
-        when(conversionService.convert(any(ProductData.class), eq(ProductDataResponse.class))).thenReturn(response);
+        when(productServiceMock.findById(id)).thenReturn(productData);
+        when(conversionServiceMock.convert(any(ProductData.class), eq(ProductDataResponse.class))).thenReturn(response);
 
         mockMvc.perform(get(BASE_URL + "/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(productData.getId().toString()))
                 .andExpect(jsonPath("$.name").value(productData.getName()));
 
-        verify(productService).findById(id);
-        verify(conversionService).convert(any(ProductData.class), eq(ProductDataResponse.class));
+        verify(productServiceMock).findById(id);
+        verify(conversionServiceMock).convert(any(ProductData.class), eq(ProductDataResponse.class));
     }
 
     @Test
     void findByIdShouldReturnExceptionWhenProductNotExists() throws Exception {
-        UUID id = UUID.randomUUID();
+        final UUID id = UUID.randomUUID();
 
-        when(productService.findById(id)).thenThrow(new ProductNotFoundException(id));
+        when(productServiceMock.findById(id)).thenThrow(new ProductNotFoundException(id));
 
         mockMvc.perform(get(BASE_URL + "/{id}", id))
                 .andExpect(status().isNotFound())
@@ -192,16 +189,15 @@ class ProductControllerImplTest {
 
     @Test
     void updateShouldReturnUpdatedProductIdWhenRequestIsValid() throws Exception {
-        UUID productId = UUID.randomUUID();
-        ProductUpdateRequest updateRequest = ProductUpdateRequest.builder()
+        final UUID productId = UUID.randomUUID();
+        final ProductUpdateRequest updateRequest = ProductUpdateRequest.builder()
                 .productNumber(BigInteger.valueOf(2312))
                 .info("Updated Info")
                 .category(Category.ELECTRONICS)
                 .price(BigDecimal.valueOf(1234))
                 .amount(BigDecimal.valueOf(10))
                 .build();
-
-        ImmutableProductUpdateDetails updateDetails = ImmutableProductUpdateDetails.builder()
+        final ImmutableProductUpdateDetails updateDetails = ImmutableProductUpdateDetails.builder()
                 .productNumber(updateRequest.getProductNumber())
                 .info(updateRequest.getInfo())
                 .category(updateRequest.getCategory())
@@ -209,9 +205,9 @@ class ProductControllerImplTest {
                 .amount(updateRequest.getAmount())
                 .build();
 
-        when(conversionService.convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class)))
+        when(conversionServiceMock.convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class)))
                 .thenReturn(updateDetails);
-        when(productService.update(productId, updateDetails)).thenReturn(productId);
+        when(productServiceMock.update(productId, updateDetails)).thenReturn(productId);
 
         mockMvc.perform(put(BASE_URL + "/{id}", productId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -219,22 +215,21 @@ class ProductControllerImplTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(productId.toString())));
 
-        verify(conversionService).convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class));
-        verify(productService).update(productId, updateDetails);
+        verify(conversionServiceMock).convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class));
+        verify(productServiceMock).update(productId, updateDetails);
     }
 
     @Test
     void updateShouldReturnExceptionWhenRequestIsNotValid() throws Exception {
-        UUID productId = UUID.randomUUID();
-        ProductUpdateRequest updateRequest = ProductUpdateRequest.builder()
+        final UUID productId = UUID.randomUUID();
+        final ProductUpdateRequest updateRequest = ProductUpdateRequest.builder()
                 .productNumber(BigInteger.valueOf(2312))
                 .info("Updated Info")
                 .category(Category.ELECTRONICS)
                 .price(BigDecimal.valueOf(-1234))
                 .amount(BigDecimal.valueOf(10))
                 .build();
-
-        ImmutableProductUpdateDetails updateDetails = ImmutableProductUpdateDetails.builder()
+        final ImmutableProductUpdateDetails updateDetails = ImmutableProductUpdateDetails.builder()
                 .productNumber(updateRequest.getProductNumber())
                 .info(updateRequest.getInfo())
                 .category(updateRequest.getCategory())
@@ -242,7 +237,7 @@ class ProductControllerImplTest {
                 .amount(updateRequest.getAmount())
                 .build();
 
-        when(conversionService.convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class)))
+        when(conversionServiceMock.convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class)))
                 .thenReturn(updateDetails);
 
         mockMvc.perform(put(BASE_URL + "/{id}", productId)
@@ -254,10 +249,9 @@ class ProductControllerImplTest {
 
     @Test
     void findAllShouldReturnPagedProductsWhenProductsExist() throws Exception {
-        UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
-
-        ProductData productData1 = ProductData.builder()
+        final UUID id1 = UUID.randomUUID();
+        final UUID id2 = UUID.randomUUID();
+        final ProductData productData1 = ProductData.builder()
                 .id(id1)
                 .name("Product1")
                 .productNumber(BigInteger.valueOf(1111))
@@ -268,7 +262,7 @@ class ProductControllerImplTest {
                 .lastAmountUpdate(LocalDateTime.now())
                 .creationTime(LocalDate.now())
                 .build();
-        ProductData productData2 = ProductData.builder()
+        final ProductData productData2 = ProductData.builder()
                 .id(id2)
                 .name("Product2")
                 .productNumber(BigInteger.valueOf(2222))
@@ -279,8 +273,7 @@ class ProductControllerImplTest {
                 .lastAmountUpdate(LocalDateTime.now())
                 .creationTime(LocalDate.now())
                 .build();
-
-        ProductDataResponse response1 = ProductDataResponse.builder()
+        final ProductDataResponse response1 = ProductDataResponse.builder()
                 .id(productData1.getId())
                 .name(productData1.getName())
                 .productNumber(productData1.getProductNumber())
@@ -291,7 +284,7 @@ class ProductControllerImplTest {
                 .lastAmountUpdate(productData1.getLastAmountUpdate())
                 .creationTime(productData1.getCreationTime())
                 .build();
-        ProductDataResponse response2 = ProductDataResponse.builder()
+        final ProductDataResponse response2 = ProductDataResponse.builder()
                 .id(productData2.getId())
                 .name(productData2.getName())
                 .productNumber(productData2.getProductNumber())
@@ -303,12 +296,12 @@ class ProductControllerImplTest {
                 .creationTime(productData2.getCreationTime())
                 .build();
 
-        Pageable pageable = PageRequest.of(0, 2);
-        Page<ProductData> productPage = new PageImpl<>(List.of(productData1, productData2), pageable, 2);
+        final Pageable pageable = PageRequest.of(0, 2);
+        final Page<ProductData> productPage = new PageImpl<>(List.of(productData1, productData2), pageable, 2);
 
-        when(productService.findAll(any(Pageable.class))).thenReturn(productPage);
-        when(conversionService.convert(productData1, ProductDataResponse.class)).thenReturn(response1);
-        when(conversionService.convert(productData2, ProductDataResponse.class)).thenReturn(response2);
+        when(productServiceMock.findAll(any(Pageable.class))).thenReturn(productPage);
+        when(conversionServiceMock.convert(productData1, ProductDataResponse.class)).thenReturn(response1);
+        when(conversionServiceMock.convert(productData2, ProductDataResponse.class)).thenReturn(response2);
 
         mockMvc.perform(get(BASE_URL)
                         .param("page", "0")
@@ -320,33 +313,31 @@ class ProductControllerImplTest {
                 .andExpect(jsonPath("$.content[1].id").value(response2.getId().toString()))
                 .andExpect(jsonPath("$.content[1].name").value(response2.getName()));
 
-        verify(productService).findAll(any(Pageable.class));
-        verify(conversionService).convert(productData1, ProductDataResponse.class);
-        verify(conversionService).convert(productData2, ProductDataResponse.class);
+        verify(productServiceMock).findAll(any(Pageable.class));
+        verify(conversionServiceMock).convert(productData1, ProductDataResponse.class);
+        verify(conversionServiceMock).convert(productData2, ProductDataResponse.class);
     }
 
 
     @Test
     void deleteShouldReturnNoContentWhenProductDeleted() throws Exception {
-        UUID productId = UUID.randomUUID();
+        final UUID productId = UUID.randomUUID();
 
         mockMvc.perform(delete(BASE_URL + "/{id}", productId))
                 .andExpect(status().isNoContent());
 
-        verify(productService).delete(productId);
+        verify(productServiceMock).delete(productId);
     }
 
     @Test
     void deleteShouldReturnExceptionWhenProductNotExists() throws Exception {
-        UUID productId = UUID.randomUUID();
+        final UUID productId = UUID.randomUUID();
 
-        doThrow(new ProductNotFoundException(productId)).when(productService).delete(productId);
+        doThrow(new ProductNotFoundException(productId)).when(productServiceMock).delete(productId);
 
         mockMvc.perform(delete(BASE_URL + "/{id}", productId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message")
                         .value("The product with ID " + productId + " was not found."));
     }
-
-
 }

@@ -13,38 +13,45 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import rustamscode.productstorageapi.persistance.enumeration.Category;
+import org.springframework.data.jpa.domain.Specification;
+import rustamscode.productstorageapi.exception.NonUniqueProductNumberException;
+import rustamscode.productstorageapi.exception.ProductNotFoundException;
+import rustamscode.productstorageapi.motherobject.ObjectMother;
+import rustamscode.productstorageapi.persistance.entity.ProductEntity;
+import rustamscode.productstorageapi.persistance.repository.ProductRepository;
+import rustamscode.productstorageapi.search.criteria.SearchCriteria;
+import rustamscode.productstorageapi.search.criteria.StringSearchCriteria;
 import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
 import rustamscode.productstorageapi.service.dto.ProductData;
-import rustamscode.productstorageapi.persistance.entity.ProductEntity;
-import rustamscode.productstorageapi.exception.NonUniqueProductNumberException;
-import rustamscode.productstorageapi.exception.ProductNotFoundException;
-import rustamscode.productstorageapi.persistance.repository.ProductRepository;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 class ProductServiceTest {
 
     @Mock
-    ProductRepository productRepository;
+    ProductRepository productRepositoryMock;
 
     @Mock
-    ConversionService conversionService;
+    ConversionService conversionServiceMock;
 
     @InjectMocks
-    ProductServiceImpl productService;
+    ProductServiceImpl underTest;
 
     ProductEntity product;
     UUID productId;
@@ -52,122 +59,150 @@ class ProductServiceTest {
     @BeforeEach
     void setup() {
         productId = UUID.randomUUID();
-        product = new ProductEntity();
-        product.setId(productId);
-        product.setName("TestProduct");
-        product.setProductNumber(BigInteger.valueOf(1111));
-        product.setInfo("TestProduct Info");
-        product.setCategory(Category.BOOKS);
-        product.setPrice(BigDecimal.valueOf(100.0));
-        product.setAmount(BigDecimal.valueOf(30));
-        product.setLastAmountUpdate(LocalDateTime.now());
+        product = ObjectMother.productEntity()
+                .withId(productId)
+                .build();
     }
 
     @Test
     void createProductSuccess() {
-        ImmutableProductCreateDetails request = mock(ImmutableProductCreateDetails.class);
-        when(conversionService.convert(request, ProductEntity.class)).thenReturn(product);
-        when(productRepository.save(product)).thenReturn(product);
+        final ImmutableProductCreateDetails request = mock(ImmutableProductCreateDetails.class);
+        when(conversionServiceMock.convert(request, ProductEntity.class)).thenReturn(product);
+        when(productRepositoryMock.save(product)).thenReturn(product);
 
-        UUID result = productService.create(request);
+        final UUID result = underTest.create(request);
 
         assertEquals(productId, result);
-        verify(productRepository).save(product);
+        verify(productRepositoryMock).save(product);
     }
 
     @Test
     void createProductThrowsNonUniqueProductNumberException() {
-        ImmutableProductCreateDetails request = mock(ImmutableProductCreateDetails.class);
-        when(conversionService.convert(request, ProductEntity.class)).thenReturn(product);
-        when(productRepository.findByProductNumber(product.getProductNumber()))
+        final ImmutableProductCreateDetails request = mock(ImmutableProductCreateDetails.class);
+        when(conversionServiceMock.convert(request, ProductEntity.class)).thenReturn(product);
+        when(productRepositoryMock.findByProductNumber(product.getProductNumber()))
                 .thenReturn(Optional.ofNullable(product));
 
-        assertThrows(NonUniqueProductNumberException.class, () -> productService.create(request));
-        verify(productRepository, never()).save(any());
+        assertThrows(NonUniqueProductNumberException.class, () -> underTest.create(request));
+        verify(productRepositoryMock, never()).save(any());
     }
 
     @Test
     void getAllPagedProductsSuccess() {
-        Pageable pageable = PageRequest.of(0, 1);
-        Page<ProductEntity> productPage = new PageImpl<>(List.of(product), pageable, 1);
-
-        ProductData productData = ProductData.builder()
+        final Pageable pageable = PageRequest.of(0, 1);
+        final Page<ProductEntity> productPage = new PageImpl<>(List.of(product), pageable, 1);
+        final ProductData productData = ProductData.builder()
                 .id(productId)
                 .name(product.getName())
                 .build();
 
-        when(productRepository.findAll(pageable)).thenReturn(productPage);
-        when(conversionService.convert(product, ProductData.class)).thenReturn(productData);
+        when(productRepositoryMock.findAll(pageable)).thenReturn(productPage);
+        when(conversionServiceMock.convert(product, ProductData.class)).thenReturn(productData);
 
-        Page<ProductData> result = productService.findAll(pageable);
+        final Page<ProductData> allProducts = underTest.findAll(pageable);
 
-        assertEquals(1, result.getTotalElements());
-        assertEquals("TestProduct", result.getContent().getFirst().getName());
+        assertEquals(1, allProducts.getTotalElements());
+        assertThat(allProducts)
+                .anySatisfy(product -> {
+                    assertEquals("Product Test", product.getName());
+                    assertEquals(productId, product.getId());
+                });
 
-        verify(productRepository).findAll(pageable);
-        verify(conversionService).convert(product, ProductData.class);
+        verify(productRepositoryMock).findAll(pageable);
+        verify(conversionServiceMock).convert(product, ProductData.class);
     }
 
     @Test
     void readProductSuccess() {
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        ProductData productData = mock(ProductData.class);
-        when(conversionService.convert(product, ProductData.class)).thenReturn(productData);
+        when(productRepositoryMock.findById(productId)).thenReturn(Optional.of(product));
+        final ProductData productData = mock(ProductData.class);
+        when(conversionServiceMock.convert(product, ProductData.class)).thenReturn(productData);
 
-        ProductData result = productService.findById(productId);
+        final ProductData result = underTest.findById(productId);
 
         assertEquals(productData, result);
-        verify(productRepository).findById(productId);
+        verify(productRepositoryMock).findById(productId);
     }
 
     @Test
     void readProductThrowsProductNotFoundException() {
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+        when(productRepositoryMock.findById(productId)).thenReturn(Optional.empty());
 
-        assertThrows(ProductNotFoundException.class, () -> productService.findById(productId));
+        assertThrows(ProductNotFoundException.class, () -> underTest.findById(productId));
     }
 
     @Test
     void updateProductSuccess() {
-        ImmutableProductUpdateDetails request = ImmutableProductUpdateDetails.builder()
+        final ImmutableProductUpdateDetails request = ImmutableProductUpdateDetails.builder()
                 .productNumber(product.getProductNumber())
                 .info(product.getInfo())
                 .category(product.getCategory())
                 .price(product.getPrice())
-                .amount(BigDecimal.valueOf(2221))
+                .amount(BigDecimal.valueOf(1234))
                 .build();
-        when(productRepository.findByIdLocked(productId)).thenReturn(Optional.of(product));
-        when(productRepository.save(product)).thenReturn(product);
+        when(productRepositoryMock.findByIdLocked(productId)).thenReturn(Optional.of(product));
+        when(productRepositoryMock.save(product)).thenReturn(product);
 
-        UUID result = productService.update(productId, request);
+        final UUID result = underTest.update(productId, request);
 
         assertEquals(productId, result);
-        verify(productRepository).save(product);
+        verify(productRepositoryMock).save(product);
     }
 
     @Test
     void updateProductThrowsProductNotFoundException() {
-        ImmutableProductUpdateDetails request = mock(ImmutableProductUpdateDetails.class);
-        when(productRepository.findByIdLocked(productId)).thenReturn(Optional.empty());
+        final ImmutableProductUpdateDetails request = mock(ImmutableProductUpdateDetails.class);
+        when(productRepositoryMock.findByIdLocked(productId)).thenReturn(Optional.empty());
 
-        assertThrows(ProductNotFoundException.class, () -> productService.update(productId, request));
+        assertThrows(ProductNotFoundException.class, () -> underTest.update(productId, request));
     }
 
     @Test
     void deleteProductSuccess() {
-        when(productRepository.existsById(productId)).thenReturn(true);
+        when(productRepositoryMock.existsById(productId)).thenReturn(true);
 
-        productService.delete(productId);
+        underTest.delete(productId);
 
-        verify(productRepository).deleteById(productId);
+        verify(productRepositoryMock).deleteById(productId);
     }
 
     @Test
     void deleteProductThrowsProductNotFoundException() {
-        when(productRepository.existsById(productId)).thenReturn(false);
+        when(productRepositoryMock.existsById(productId)).thenReturn(false);
 
-        assertThrows(ProductNotFoundException.class, () -> productService.delete(productId));
-        verify(productRepository, never()).deleteById(any());
+        assertThrows(ProductNotFoundException.class, () -> underTest.delete(productId));
+        verify(productRepositoryMock, never()).deleteById(any());
+    }
+
+    @Test
+    void searchProductByStringCriteriaSuccess() {
+        final ProductData productData = ProductData.builder()
+                .id(productId)
+                .name(product.getName())
+                .build();
+        final List<SearchCriteria> criteriaList = List.of(
+                StringSearchCriteria.builder()
+                        .field("name")
+                        .value("Product")
+                        .operationType("~")
+                        .build());
+        final Pageable pageable = PageRequest.of(0, 1);
+        final Page<ProductEntity> productPage = new PageImpl<>(List.of(product), pageable, 1);
+
+        when(productRepositoryMock.findAll(any(Specification.class), eq(pageable))).thenReturn(productPage);
+        when(conversionServiceMock.convert(product, ProductData.class)).thenReturn(productData);
+
+        final Page<ProductData> filteredProducts = underTest.search(pageable, criteriaList);
+
+        assertEquals(1, filteredProducts.getTotalElements());
+        assertThat(filteredProducts)
+                .anySatisfy(product -> {
+                    assertEquals("Product Test", product.getName());
+                    assertEquals(productId, product.getId());
+                });
+
+        verify(productRepositoryMock).findAll(any(Specification.class), eq(pageable));
+        verify(conversionServiceMock).convert(product, ProductData.class);
     }
 
 
