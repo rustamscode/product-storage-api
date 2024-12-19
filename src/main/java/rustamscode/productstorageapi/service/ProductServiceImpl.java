@@ -103,7 +103,6 @@ public class ProductServiceImpl implements ProductService {
      *
      * @param id      the ID of the product to be updated
      * @param request the details to update the product with
-     * @return the ID of the updated product
      * @return ID of the updated product
      * @throws IllegalArgumentException        if the provided id or request is null
      * @throws ProductNotFoundException        if no product is found with the given id
@@ -179,6 +178,4 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll(specification, pageable)
                 .map(product -> conversionService.convert(product, ProductData.class));
     }
-
-
 }
