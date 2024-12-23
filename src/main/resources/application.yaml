@@ -15,14 +15,16 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.xml
     enabled: true
   scheduling:
-    enabled: false
+    mode: optimized
     period: 60000
     priceIncreasePercentage: 10.1
-    optimization: true
 
 server:
   port: 8080
   servlet:
     context-path: /app
+
+file:
+  product-price-update-info: "price_update_log"
 
 

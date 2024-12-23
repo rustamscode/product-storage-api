@@ -1,15 +1,13 @@
 package rustamscode.productstorageapi.search.criteria;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import rustamscode.productstorageapi.exception.UnsupportedOperationTypeException;
 import rustamscode.productstorageapi.search.enumeration.OperationType;
+import rustamscode.productstorageapi.search.strategy.PredicateStrategy;
+import rustamscode.productstorageapi.search.strategy.UuidPredicateStrategy;
 
 import java.util.UUID;
 
@@ -17,6 +15,8 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UuidSearchCriteria implements SearchCriteria<UUID> {
+
+    final static PredicateStrategy STRATEGY = new UuidPredicateStrategy();
 
     final String field;
 
@@ -26,14 +26,12 @@ public class UuidSearchCriteria implements SearchCriteria<UUID> {
     final String operationType;
 
     @Override
-    public Predicate toPredicate(CriteriaBuilder builder, Root root) {
-        Predicate predicate;
+    public PredicateStrategy getStrategy() {
+        return STRATEGY;
+    }
 
-        switch (OperationType.fromOperation(operationType)) {
-            case EQUAL, LIKE, GREATER_THAN_OR_EQUAL, LESS_THAN_OR_EQUAL ->
-                    predicate = builder.equal(root.get(field), value);
-            default -> throw new UnsupportedOperationTypeException(operationType, field);
-        }
-        return predicate;
+    @Override
+    public OperationType getOperationType() {
+        return OperationType.fromOperation(operationType);
     }
 }

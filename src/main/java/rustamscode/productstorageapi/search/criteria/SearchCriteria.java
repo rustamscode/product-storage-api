@@ -2,9 +2,9 @@ package rustamscode.productstorageapi.search.criteria;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.validation.constraints.NotNull;
+import rustamscode.productstorageapi.search.enumeration.OperationType;
+import rustamscode.productstorageapi.search.strategy.PredicateStrategy;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -22,5 +22,13 @@ import jakarta.persistence.criteria.Root;
 })
 public interface SearchCriteria<T> {
 
-    Predicate toPredicate(CriteriaBuilder builder, Root root);
+    PredicateStrategy getStrategy();
+
+    String getField();
+
+    @NotNull
+    T getValue();
+
+    @NotNull
+    OperationType getOperationType();
 }

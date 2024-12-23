@@ -1,6 +1,5 @@
 package rustamscode.productstorageapi.service;
 
-import jakarta.persistence.criteria.Predicate;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,6 +15,7 @@ import rustamscode.productstorageapi.exception.ProductNotFoundException;
 import rustamscode.productstorageapi.persistance.entity.ProductEntity;
 import rustamscode.productstorageapi.persistance.repository.ProductRepository;
 import rustamscode.productstorageapi.search.criteria.SearchCriteria;
+import rustamscode.productstorageapi.search.specification.ProductSpecification;
 import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
 import rustamscode.productstorageapi.service.dto.ProductData;
@@ -36,6 +36,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductServiceImpl implements ProductService {
 
+    final ProductSpecification productSpecification;
     /**
      * Repository for accessing product data in the database.
      */
@@ -166,14 +167,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public Page<ProductData> search(Pageable pageable, List<SearchCriteria> criteriaList) {
-        Specification<ProductEntity> specification = (root, query, builder) ->
-        {
-            final Predicate[] predicates = criteriaList.stream()
-                    .map(criteria -> criteria.toPredicate(builder, root))
-                    .toArray(Predicate[]::new);
-
-            return builder.and(predicates);
-        };
+        Specification<ProductEntity> specification = productSpecification.generateSpecification(criteriaList);
 
         return productRepository.findAll(specification, pageable)
                 .map(product -> conversionService.convert(product, ProductData.class));

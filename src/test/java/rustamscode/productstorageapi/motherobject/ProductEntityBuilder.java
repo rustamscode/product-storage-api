@@ -36,56 +36,56 @@ public class ProductEntityBuilder {
     private ProductEntityBuilder() {
     }
 
-    public static ProductEntityBuilder productEntity() {
+    protected static ProductEntityBuilder getInstance() {
         return new ProductEntityBuilder();
     }
 
-    public ProductEntityBuilder withId(UUID id) {
+    public ProductEntityBuilder withId(final UUID id) {
         this.id = id;
         return this;
     }
 
-    public ProductEntityBuilder withName(String name) {
+    public ProductEntityBuilder withName(final String name) {
         this.name = name;
         return this;
     }
 
-    public ProductEntityBuilder withProductNumber(BigInteger productNumber) {
+    public ProductEntityBuilder withProductNumber(final BigInteger productNumber) {
         this.productNumber = productNumber;
         return this;
     }
 
-    public ProductEntityBuilder withInfo(String info) {
+    public ProductEntityBuilder withInfo(final String info) {
         this.info = info;
         return this;
     }
 
-    public ProductEntityBuilder withCategory(Category category) {
+    public ProductEntityBuilder withCategory(final Category category) {
         this.category = category;
         return this;
     }
 
-    public ProductEntityBuilder withPrice(BigDecimal price) {
+    public ProductEntityBuilder withPrice(final BigDecimal price) {
         this.price = price;
         return this;
     }
 
-    public ProductEntityBuilder withAmount(BigDecimal amount) {
+    public ProductEntityBuilder withAmount(final BigDecimal amount) {
         this.amount = amount;
         return this;
     }
 
-    public ProductEntityBuilder withLastAmountUpdate(LocalDateTime lastAmountUpdate) {
+    public ProductEntityBuilder withLastAmountUpdate(final LocalDateTime lastAmountUpdate) {
         this.lastAmountUpdate = lastAmountUpdate;
         return this;
     }
 
-    public ProductEntityBuilder withCreationTime(LocalDateTime creationTime) {
+    public ProductEntityBuilder withCreationTime(final LocalDateTime creationTime) {
         this.creationTime = creationTime;
         return this;
     }
 
-    public ProductEntityBuilder withVersion(Integer version) {
+    public ProductEntityBuilder withVersion(final Integer version) {
         this.version = version;
         return this;
     }
@@ -104,6 +104,4 @@ public class ProductEntityBuilder {
                 .version(version)
                 .build();
     }
-
-
 }

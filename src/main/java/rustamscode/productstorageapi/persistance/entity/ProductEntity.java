@@ -67,5 +67,6 @@ public class ProductEntity {
     LocalDateTime creationTime;
 
     @Version
+    @Column(name = "version")
     Integer version;
 }

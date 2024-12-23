@@ -10,6 +10,7 @@ import rustamscode.productstorageapi.persistance.entity.ProductEntity;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,15 +27,4 @@ public interface ProductRepository extends JpaRepository<ProductEntity, UUID>, J
             FOR UPDATE;
             """, nativeQuery = true)
     Optional<ProductEntity> findByIdLocked(@Param("id") UUID id);
-
-    @Modifying
-    @Query(value = """
-            UPDATE products SET price = price + (price * (:increasePercentage / 100)) 
-            RETURNING *;
-            """, nativeQuery = true)
-    List<String> updatePrice(@Param("increasePercentage") BigDecimal increasePercentage);
-
-    @Modifying
-    @Query(value = "LOCK TABLE products IN EXCLUSIVE MODE", nativeQuery = true)
-    void lockTableForUpdate();
 }

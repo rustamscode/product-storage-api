@@ -25,5 +25,5 @@ public class ImmutableProductCreateDetails {
     BigDecimal amount;
 
     @PastOrPresent
-    LocalDateTime lastUpdateTime;
+    LocalDateTime lastAmountUpdate;
 }
