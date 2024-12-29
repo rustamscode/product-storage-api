@@ -13,7 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import rustamscode.productstorageapi.config.GlobalExceptionHandler;
+import rustamscode.productstorageapi.advice.GlobalExceptionHandler;
+import rustamscode.productstorageapi.enumeration.Currency;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
 import rustamscode.productstorageapi.motherobject.ObjectMother;
 import rustamscode.productstorageapi.service.ProductService;
@@ -79,14 +80,14 @@ class ProductControllerImplTest extends ControllerTest {
     final ImmutableProductCreateDetails immutableCreateDetails = ObjectMother.immutableProductCreateDetails().build();
     final ProductCreateRequest createRequest = ObjectMother.productCreateRequest().build();
     when(conversionServiceMock.convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class)))
-            .thenReturn(immutableCreateDetails);
+        .thenReturn(immutableCreateDetails);
     when(productServiceMock.create(immutableCreateDetails)).thenReturn(expectedId);
 
     final String result = mockMvc.perform(post(BASE_URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(createRequest)))
-            .andExpect(status().isCreated())
-            .andReturn().getResponse().getContentAsString();
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(createRequest)))
+        .andExpect(status().isCreated())
+        .andReturn().getResponse().getContentAsString();
     final UUID actual = objectMapper.readValue(result, UUID.class);
 
     assertEquals(expectedId, actual);
@@ -97,14 +98,14 @@ class ProductControllerImplTest extends ControllerTest {
   @Test
   void createShouldReturnErrorDetailsWhenRequestIsInvalidByOneField() throws Exception {
     final ProductCreateRequest invalidCreateRequest = ObjectMother.productCreateRequest()
-            .withPrice(BigDecimal.valueOf(-1234))
-            .build();
+        .withPrice(BigDecimal.valueOf(-1234))
+        .build();
 
     final String result = mockMvc.perform(post(BASE_URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(invalidCreateRequest)))
-            .andExpect(status().isBadRequest())
-            .andReturn().getResponse().getContentAsString();
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(invalidCreateRequest)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse().getContentAsString();
     final ErrorDetails actual = objectMapper.readValue(result, ErrorDetails.class);
     final String actualMessage = actual.getMessage();
 
@@ -114,15 +115,15 @@ class ProductControllerImplTest extends ControllerTest {
   @Test
   void createShouldReturnErrorDetailsWhenRequestIsInvalidBySeveralFields() throws Exception {
     final ProductCreateRequest invalidCreateRequest = ObjectMother.productCreateRequest()
-            .withName("Product".repeat(40))
-            .withPrice(BigDecimal.valueOf(-1234))
-            .build();
+        .withName("Product".repeat(40))
+        .withPrice(BigDecimal.valueOf(-1234))
+        .build();
 
     final String result = mockMvc.perform(post(BASE_URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(invalidCreateRequest)))
-            .andExpect(status().isBadRequest())
-            .andReturn().getResponse().getContentAsString();
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(invalidCreateRequest)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse().getContentAsString();
     final ErrorDetails actual = objectMapper.readValue(result, ErrorDetails.class);
     final String actualMessage = actual.getMessage();
 
@@ -135,26 +136,30 @@ class ProductControllerImplTest extends ControllerTest {
     final ProductData data = ObjectMother.productData().build();
     final ProductDataResponse dataResponse = ObjectMother.productDataResponse().build();
 
-    when(productServiceMock.findById(expectedId)).thenReturn(data);
+    when(productServiceMock.findById(Currency.RUB, expectedId)).thenReturn(data);
     when(conversionServiceMock.convert(any(ProductData.class), eq(ProductDataResponse.class))).thenReturn(dataResponse);
 
-    final String result = mockMvc.perform(get(BASE_URL + "/{id}", expectedId))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+    final String result = mockMvc.perform(get(BASE_URL + "/{id}", expectedId)
+            .header("currency", "RUB"))
+        .andExpect(status().isOk())
+        .andReturn().getResponse().getContentAsString();
     final ProductDataResponse actual = objectMapper.readValue(result, ProductDataResponse.class);
 
-    assertEquals(dataResponse, actual);
-    verify(productServiceMock).findById(expectedId);
+    assertEquals(dataResponse.getId(), actual.getId());
+    assertEquals(dataResponse.getName(), actual.getName());
+    assertEquals(dataResponse.getCurrency(), actual.getCurrency());
+    verify(productServiceMock).findById(Currency.RUB, expectedId);
     verify(conversionServiceMock).convert(any(ProductData.class), eq(ProductDataResponse.class));
   }
 
   @Test
   void findByIdShouldReturnErrorDetailsWhenProductNotExists() throws Exception {
-    when(productServiceMock.findById(expectedId)).thenThrow(new ProductNotFoundException(expectedId));
+    when(productServiceMock.findById(Currency.RUB, expectedId)).thenThrow(new ProductNotFoundException(expectedId));
 
-    final String result = mockMvc.perform(get(BASE_URL + "/{id}", expectedId))
-            .andExpect(status().isNotFound())
-            .andReturn().getResponse().getContentAsString();
+    final String result = mockMvc.perform(get(BASE_URL + "/{id}", expectedId)
+            .header("currency", "RUB"))
+        .andExpect(status().isNotFound())
+        .andReturn().getResponse().getContentAsString();
     final ErrorDetails actual = objectMapper.readValue(result, ErrorDetails.class);
     final String actualMessage = actual.getMessage();
 
@@ -166,14 +171,14 @@ class ProductControllerImplTest extends ControllerTest {
     final ProductUpdateRequest updateRequest = ObjectMother.productUpdateRequest().build();
     final ImmutableProductUpdateDetails immutableUpdateDetails = ObjectMother.immutableProductUpdateDetails().build();
     when(conversionServiceMock.convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class)))
-            .thenReturn(immutableUpdateDetails);
+        .thenReturn(immutableUpdateDetails);
     when(productServiceMock.update(expectedId, immutableUpdateDetails)).thenReturn(expectedId);
 
     final String result = mockMvc.perform(put(BASE_URL + "/{id}", expectedId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(updateRequest)))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateRequest)))
+        .andExpect(status().isOk())
+        .andReturn().getResponse().getContentAsString();
     final UUID actual = objectMapper.readValue(result, UUID.class);
 
     assertEquals(expectedId, actual);
@@ -184,14 +189,14 @@ class ProductControllerImplTest extends ControllerTest {
   @Test
   void updateShouldReturnErrorDetailsWhenRequestIsNotValid() throws Exception {
     final ProductUpdateRequest updateRequest = ObjectMother.productUpdateRequest()
-            .withAmount(BigDecimal.valueOf(-1234))
-            .build();
+        .withAmount(BigDecimal.valueOf(-1234))
+        .build();
 
     final String result = mockMvc.perform(put(BASE_URL + "/{id}", expectedId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(updateRequest)))
-            .andExpect(status().isBadRequest())
-            .andReturn().getResponse().getContentAsString();
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateRequest)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse().getContentAsString();
     final ErrorDetails actual = objectMapper.readValue(result, ErrorDetails.class);
     final String actualMessage = actual.getMessage();
 
@@ -203,34 +208,35 @@ class ProductControllerImplTest extends ControllerTest {
     final UUID expectedId1 = UUID.randomUUID();
     final UUID expectedId2 = UUID.randomUUID();
     final ProductData data1 = ObjectMother.productData()
-            .withId(expectedId1)
-            .build();
+        .withId(expectedId1)
+        .build();
     final ProductData data2 = ObjectMother.productData()
-            .withId(expectedId2)
-            .build();
+        .withId(expectedId2)
+        .build();
     final ProductDataResponse dataResponse1 = ObjectMother.productDataResponse()
-            .withId(expectedId1)
-            .build();
+        .withId(expectedId1)
+        .build();
     final ProductDataResponse dataResponse2 = ObjectMother.productDataResponse()
-            .withId(expectedId1)
-            .build();
+        .withId(expectedId1)
+        .build();
     final Pageable pageable = PageRequest.of(0, 2);
     final Page<ProductData> productPage = new PageImpl<>(List.of(data1, data2), pageable, 2);
-    when(productServiceMock.findAll(any(Pageable.class))).thenReturn(productPage);
+    when(productServiceMock.findAll(any(), any(Pageable.class))).thenReturn(productPage);
     when(conversionServiceMock.convert(data1, ProductDataResponse.class)).thenReturn(dataResponse1);
     when(conversionServiceMock.convert(data2, ProductDataResponse.class)).thenReturn(dataResponse2);
 
     mockMvc.perform(get(BASE_URL)
-                    .param("page", "0")
-                    .param("size", "2")
-                    .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content[0].id").value(dataResponse1.getId().toString()))
-            .andExpect(jsonPath("$.content[0].name").value(dataResponse1.getName()))
-            .andExpect(jsonPath("$.content[1].id").value(dataResponse2.getId().toString()))
-            .andExpect(jsonPath("$.content[1].name").value(dataResponse2.getName()));
+            .header("currency", "RUB")
+            .param("page", "0")
+            .param("size", "2")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.content[0].id").value(dataResponse1.getId().toString()))
+        .andExpect(jsonPath("$.content[0].name").value(dataResponse1.getName()))
+        .andExpect(jsonPath("$.content[1].id").value(dataResponse2.getId().toString()))
+        .andExpect(jsonPath("$.content[1].name").value(dataResponse2.getName()));
 
-    verify(productServiceMock).findAll(any(Pageable.class));
+    verify(productServiceMock).findAll(any(), any(Pageable.class));
     verify(conversionServiceMock).convert(data1, ProductDataResponse.class);
     verify(conversionServiceMock).convert(data2, ProductDataResponse.class);
   }
@@ -238,7 +244,7 @@ class ProductControllerImplTest extends ControllerTest {
   @Test
   void deleteShouldReturnNoContentWhenProductDeleted() throws Exception {
     mockMvc.perform(delete(BASE_URL + "/{id}", expectedId))
-            .andExpect(status().isNoContent());
+        .andExpect(status().isNoContent());
 
     verify(productServiceMock).delete(expectedId);
   }
@@ -248,8 +254,8 @@ class ProductControllerImplTest extends ControllerTest {
     doThrow(new ProductNotFoundException(expectedId)).when(productServiceMock).delete(expectedId);
 
     final String result = mockMvc.perform(delete(BASE_URL + "/{id}", expectedId))
-            .andExpect(status().isNotFound())
-            .andReturn().getResponse().getContentAsString();
+        .andExpect(status().isNotFound())
+        .andReturn().getResponse().getContentAsString();
     final ErrorDetails actual = objectMapper.readValue(result, ErrorDetails.class);
     final String actualMessage = actual.getMessage();
 

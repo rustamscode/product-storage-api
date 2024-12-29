@@ -1,7 +1,7 @@
 package rustamscode.productstorageapi.motherobject;
 
 import lombok.Getter;
-import rustamscode.productstorageapi.persistance.enumeration.Category;
+import rustamscode.productstorageapi.enumeration.Category;
 import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
 
 import java.math.BigDecimal;
@@ -70,13 +70,13 @@ public class ImmutableProductCreateDetailsBuilder {
 
   public ImmutableProductCreateDetails build() {
     return ImmutableProductCreateDetails.builder()
-            .name(name)
-            .productNumber(productNumber)
-            .info(info)
-            .category(category)
-            .price(price)
-            .amount(amount)
-            .lastAmountUpdate(lastAmountUpdate)
-            .build();
+        .name(name)
+        .productNumber(productNumber)
+        .info(info)
+        .category(category)
+        .price(price)
+        .amount(amount)
+        .lastAmountUpdate(lastAmountUpdate)
+        .build();
   }
 }

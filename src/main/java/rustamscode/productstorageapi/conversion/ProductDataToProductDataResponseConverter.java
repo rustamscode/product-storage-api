@@ -11,15 +11,15 @@ public class ProductDataToProductDataResponseConverter implements Converter<Prod
   @Override
   public ProductDataResponse convert(ProductData productData) {
     return ProductDataResponse.builder()
-            .id(productData.getId())
-            .name(productData.getName())
-            .productNumber(productData.getProductNumber())
-            .info(productData.getInfo())
-            .category(productData.getCategory())
-            .price(productData.getPrice())
-            .amount(productData.getAmount())
-            .lastAmountUpdate(productData.getLastAmountUpdate())
-            .creationTime(productData.getCreationTime())
-            .build();
+        .id(productData.getId())
+        .name(productData.getName())
+        .productNumber(productData.getProductNumber())
+        .info(productData.getInfo())
+        .category(productData.getCategory())
+        .price(productData.getPrice())
+        .amount(productData.getAmount())
+        .lastAmountUpdate(productData.getLastAmountUpdate())
+        .creationTime(productData.getCreationTime())
+        .build();
   }
 }

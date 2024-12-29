@@ -12,15 +12,15 @@ public class ProductEntityToProductDataConverter implements Converter<ProductEnt
   @Override
   public ProductData convert(ProductEntity product) {
     return ProductData.builder()
-            .id(product.getId())
-            .name(product.getName())
-            .productNumber(product.getProductNumber())
-            .info(product.getInfo())
-            .category(product.getCategory())
-            .price(product.getPrice())
-            .amount(product.getAmount())
-            .lastAmountUpdate(product.getLastAmountUpdate())
-            .creationTime(product.getCreationTime().toLocalDate())
-            .build();
+        .id(product.getId())
+        .name(product.getName())
+        .productNumber(product.getProductNumber())
+        .info(product.getInfo())
+        .category(product.getCategory())
+        .price(product.getPrice())
+        .amount(product.getAmount())
+        .lastAmountUpdate(product.getLastAmountUpdate())
+        .creationTime(product.getCreationTime().toLocalDate())
+        .build();
   }
 }

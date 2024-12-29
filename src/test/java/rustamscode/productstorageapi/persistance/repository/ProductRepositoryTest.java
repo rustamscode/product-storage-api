@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
 import rustamscode.productstorageapi.motherobject.ObjectMother;
 import rustamscode.productstorageapi.persistance.entity.ProductEntity;
-import rustamscode.productstorageapi.persistance.enumeration.Category;
+import rustamscode.productstorageapi.enumeration.Category;
 import rustamscode.productstorageapi.search.criteria.BigDecimalSearchCriteria;
 import rustamscode.productstorageapi.search.criteria.SearchCriteria;
 import rustamscode.productstorageapi.search.criteria.StringSearchCriteria;

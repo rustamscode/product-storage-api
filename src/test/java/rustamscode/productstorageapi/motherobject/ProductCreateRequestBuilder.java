@@ -1,7 +1,7 @@
 package rustamscode.productstorageapi.motherobject;
 
 import lombok.Getter;
-import rustamscode.productstorageapi.persistance.enumeration.Category;
+import rustamscode.productstorageapi.enumeration.Category;
 import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
 
 import java.math.BigDecimal;

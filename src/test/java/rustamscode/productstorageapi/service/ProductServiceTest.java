@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import rustamscode.productstorageapi.enumeration.Currency;
 import rustamscode.productstorageapi.exception.NonUniqueProductNumberException;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
 import rustamscode.productstorageapi.motherobject.ObjectMother;
@@ -104,7 +105,7 @@ class ProductServiceTest extends ServiceTest {
 
     when(productRepositoryMock.findAll(pageable)).thenReturn(productPage);
     when(conversionServiceMock.convert(expectedProduct, ProductData.class)).thenReturn(productData);
-    final Page<ProductData> actual = underTest.findAll(pageable);
+    final Page<ProductData> actual = underTest.findAll(Currency.RUB, pageable);
 
     assertEquals(1, actual.getTotalElements());
     assertThat(actual)
@@ -122,7 +123,7 @@ class ProductServiceTest extends ServiceTest {
 
     when(productRepositoryMock.findById(expectedId)).thenReturn(Optional.of(expectedProduct));
     when(conversionServiceMock.convert(expectedProduct, ProductData.class)).thenReturn(expectedProductData);
-    final ProductData actualProductData = underTest.findById(expectedId);
+    final ProductData actualProductData = underTest.findById(Currency.RUB, expectedId);
 
     assertEquals(expectedProductData, actualProductData);
     verify(productRepositoryMock).findById(expectedId);
@@ -132,7 +133,7 @@ class ProductServiceTest extends ServiceTest {
   void readProductThrowsProductNotFoundException() {
     when(productRepositoryMock.findById(expectedId)).thenReturn(Optional.empty());
 
-    assertThrows(ProductNotFoundException.class, () -> underTest.findById(expectedId));
+    assertThrows(ProductNotFoundException.class, () -> underTest.findById(Currency.RUB, expectedId));
   }
 
   @Test
@@ -192,7 +193,7 @@ class ProductServiceTest extends ServiceTest {
     when(productSpecification.generateSpecification(criteriaList)).thenReturn(specificationMock);
     when(productRepositoryMock.findAll(any(Specification.class), any(Pageable.class))).thenReturn(expectedProductPage);
     when(conversionServiceMock.convert(expectedProduct, ProductData.class)).thenReturn(expectedProductData);
-    final Page<ProductData> actualPage = underTest.search(pageable, criteriaList);
+    final Page<ProductData> actualPage = underTest.search(Currency.RUB, pageable, criteriaList);
 
     assertEquals(1, actualPage.getTotalElements());
     assertThat(actualPage)

@@ -1,4 +1,4 @@
-package rustamscode.productstorageapi.config;
+package rustamscode.productstorageapi.advice;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +26,10 @@ public class GlobalExceptionHandler {
     log.error(exception.getMessage());
 
     return ErrorDetails.builder()
-            .message(exception.getMessage())
-            .exception(exception.getClass().getSimpleName())
-            .source(exception.getStackTrace()[0].getClassName())
-            .build();
+        .message(exception.getMessage())
+        .exception(exception.getClass().getSimpleName())
+        .source(exception.getStackTrace()[0].getClassName())
+        .build();
   }
 
   @ExceptionHandler(NonUniqueProductNumberException.class)
@@ -38,10 +38,10 @@ public class GlobalExceptionHandler {
     log.error(exception.getMessage());
 
     return ErrorDetails.builder()
-            .message(exception.getMessage())
-            .exception(exception.getClass().getSimpleName())
-            .source(exception.getStackTrace()[0].getClassName())
-            .build();
+        .message(exception.getMessage())
+        .exception(exception.getClass().getSimpleName())
+        .source(exception.getStackTrace()[0].getClassName())
+        .build();
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -50,18 +50,18 @@ public class GlobalExceptionHandler {
     log.error(exception.getMessage());
 
     String message = exception.getBindingResult()
-            .getAllErrors()
-            .stream()
-            .map(error -> error.getDefaultMessage())
-            .collect(joining("; "));
+        .getAllErrors()
+        .stream()
+        .map(error -> error.getDefaultMessage())
+        .collect(joining("; "));
 
     String className = exception.getStackTrace()[0].getClassName();
 
     return ErrorDetails.builder()
-            .message(message)
-            .exception(exception.getClass().getSimpleName())
-            .source(className.substring(className.lastIndexOf(".") + 1))
-            .build();
+        .message(message)
+        .exception(exception.getClass().getSimpleName())
+        .source(className.substring(className.lastIndexOf(".") + 1))
+        .build();
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
@@ -70,17 +70,17 @@ public class GlobalExceptionHandler {
     log.error(exception.getMessage());
 
     String message = exception.getConstraintViolations()
-            .stream()
-            .map(Object::toString)
-            .collect(joining(" ;"));
+        .stream()
+        .map(Object::toString)
+        .collect(joining(" ;"));
 
     String className = exception.getStackTrace()[0].getClassName();
 
     return ErrorDetails.builder()
-            .message(message)
-            .exception(exception.getClass().getSimpleName())
-            .source(className.substring(className.lastIndexOf(".") + 1))
-            .build();
+        .message(message)
+        .exception(exception.getClass().getSimpleName())
+        .source(className.substring(className.lastIndexOf(".") + 1))
+        .build();
   }
 
   @ExceptionHandler(UnsupportedOperationTypeException.class)
@@ -89,10 +89,10 @@ public class GlobalExceptionHandler {
     log.error(exception.getMessage());
 
     return ErrorDetails.builder()
-            .message(exception.getMessage())
-            .exception(exception.getClass().getSimpleName())
-            .source(exception.getStackTrace()[0].getClassName())
-            .build();
+        .message(exception.getMessage())
+        .exception(exception.getClass().getSimpleName())
+        .source(exception.getStackTrace()[0].getClassName())
+        .build();
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -101,10 +101,10 @@ public class GlobalExceptionHandler {
     log.error(exception.getMessage());
 
     return ErrorDetails.builder()
-            .message(exception.getMessage())
-            .exception(exception.getClass().getSimpleName())
-            .source(exception.getStackTrace()[0].getClassName())
-            .build();
+        .message(exception.getMessage())
+        .exception(exception.getClass().getSimpleName())
+        .source(exception.getStackTrace()[0].getClassName())
+        .build();
   }
 
   @ExceptionHandler(Exception.class)
@@ -113,9 +113,9 @@ public class GlobalExceptionHandler {
     log.error(exception.getMessage());
 
     return ErrorDetails.builder()
-            .message(exception.getMessage())
-            .exception(exception.getClass().getSimpleName())
-            .source(exception.getStackTrace()[0].getClassName())
-            .build();
+        .message(exception.getMessage())
+        .exception(exception.getClass().getSimpleName())
+        .source(exception.getStackTrace()[0].getClassName())
+        .build();
   }
 }

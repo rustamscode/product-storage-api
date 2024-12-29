@@ -1,8 +1,12 @@
 package rustamscode.productstorageapi.web.dto;
 
+import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Value;
-import rustamscode.productstorageapi.persistance.enumeration.Category;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+import rustamscode.productstorageapi.enumeration.Category;
+import rustamscode.productstorageapi.enumeration.Currency;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -16,16 +20,20 @@ import java.util.UUID;
  * and is used for passing product data to controller layer.
  */
 
-@Value
+
+@Setter
 @Builder
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDataResponse {
-    UUID id;
-    String name;
-    BigInteger productNumber;
-    String info;
-    Category category;
-    BigDecimal price;
-    BigDecimal amount;
-    LocalDateTime lastAmountUpdate;
-    LocalDate creationTime;
+  UUID id;
+  String name;
+  BigInteger productNumber;
+  String info;
+  Category category;
+  BigDecimal price;
+  BigDecimal amount;
+  LocalDateTime lastAmountUpdate;
+  LocalDate creationTime;
+  Currency currency;
 }

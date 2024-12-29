@@ -22,11 +22,15 @@ public class ObjectMother {
     return ProductDataResponseBuilder.getInstance();
   }
 
-  public static ProductUpdateRequestBuilder productUpdateRequest(){
+  public static ProductUpdateRequestBuilder productUpdateRequest() {
     return ProductUpdateRequestBuilder.getInstance();
   }
 
-  public static ImmutableProductUpdateDetailsBuilder immutableProductUpdateDetails(){
+  public static ImmutableProductUpdateDetailsBuilder immutableProductUpdateDetails() {
     return ImmutableProductUpdateDetailsBuilder.getInstance();
+  }
+
+  public static CurrencyRateDetailsBuilder currencyRateDetails() {
+    return CurrencyRateDetailsBuilder.getInstance();
   }
 }
