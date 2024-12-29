@@ -6,7 +6,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
 
-    <include file="create-table-products.xml" relativeToChangelogFile="true"/>
+    <include file="create-table-product.xml" relativeToChangelogFile="true"/>
 
     <changeSet id="task-0" author="Rustamscode">
         <tagDatabase tag="task-0"/>
