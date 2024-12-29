@@ -1,11 +1,8 @@
 package rustamscode.productstorageapi.service.dto;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Value;
-import lombok.experimental.FieldDefaults;
-import rustamscode.productstorageapi.persistance.entity.product.Category;
-
+import rustamscode.productstorageapi.persistance.enumeration.Category;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -16,7 +13,6 @@ import java.math.BigInteger;
 
 @Value
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ImmutableProductUpdateDetails {
     BigInteger productNumber;
     String info;

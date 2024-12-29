@@ -1,10 +1,8 @@
 package rustamscode.productstorageapi.web.dto;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Value;
-import lombok.experimental.FieldDefaults;
-import rustamscode.productstorageapi.persistance.entity.product.Category;
+import rustamscode.productstorageapi.persistance.enumeration.Category;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -20,7 +18,6 @@ import java.util.UUID;
 
 @Value
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDataResponse {
     UUID id;
     String name;

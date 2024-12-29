@@ -1,4 +1,4 @@
-package rustamscode.productstorageapi.persistance.entity.product;
+package rustamscode.productstorageapi.persistance.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,11 +9,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import rustamscode.productstorageapi.persistance.enumeration.Category;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -22,8 +26,11 @@ import java.util.UUID;
 
 @Table(name = "products")
 @Entity
-@Getter
 @Setter
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductEntity {
     @Id
@@ -60,5 +67,6 @@ public class ProductEntity {
     LocalDateTime creationTime;
 
     @Version
+    @Column(name = "version")
     Integer version;
 }

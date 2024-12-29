@@ -16,11 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import rustamscode.productstorageapi.search.criteria.SearchCriteria;
 import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
 import rustamscode.productstorageapi.web.dto.ProductDataResponse;
-import rustamscode.productstorageapi.web.dto.ProductFilterRequest;
 import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Product management API")
@@ -38,7 +39,7 @@ public interface ProductController {
 
     @Operation(summary = "Find all products")
     @GetMapping
-    Page<ProductDataResponse> findAll(@PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable);
+    Page<ProductDataResponse> findAll(@PageableDefault(sort = "name") final Pageable pageable);
 
     @Operation(summary = "Update a product")
     @PutMapping("/{id}")
@@ -51,6 +52,7 @@ public interface ProductController {
     void delete(@PathVariable final UUID id);
 
     @GetMapping("/search")
-    @Operation(summary = "Search products using filters")
-    Page<ProductDataResponse> searchProducts(@Valid ProductFilterRequest filterRequest);
+    @Operation(summary = "Search for product")
+    Page<ProductDataResponse> search(@PageableDefault(sort = "name") Pageable pageable,
+                                     @Valid @RequestBody List<SearchCriteria> criteriaList);
 }

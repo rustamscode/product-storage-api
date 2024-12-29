@@ -1,24 +1,23 @@
 package rustamscode.productstorageapi.web.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import rustamscode.productstorageapi.config.GlobalExceptionHandler;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
-import rustamscode.productstorageapi.persistance.entity.product.Category;
+import rustamscode.productstorageapi.motherobject.ObjectMother;
 import rustamscode.productstorageapi.service.ProductService;
+import rustamscode.productstorageapi.service.dto.ErrorDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
 import rustamscode.productstorageapi.service.dto.ProductData;
@@ -27,12 +26,11 @@ import rustamscode.productstorageapi.web.dto.ProductDataResponse;
 import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -42,311 +40,219 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
+class ProductControllerImplTest extends ControllerTest {
 
-@WebMvcTest(ProductControllerImpl.class)
-class ProductControllerImplTest {
+  @InjectMocks
+  ProductControllerImpl underTest;
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Mock
+  ProductService productServiceMock;
 
-    @Autowired
-    ObjectMapper objectMapper;
+  @Mock
+  ConversionService conversionServiceMock;
 
-    @MockBean
-    private ProductService productService;
+  static final String BASE_URL = "/products";
 
-    @MockBean
-    private FormattingConversionService conversionService;
+  final UUID expectedId = UUID.randomUUID();
 
-    private static final String BASE_URL = "/products";
+  @Override
+  protected Object getController() {
+    return underTest;
+  }
 
-    @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ProductControllerImpl(productService, conversionService))
-                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
-                .setControllerAdvice(new GlobalExceptionHandler())
-                .build();
-    }
+  @Override
+  protected HandlerMethodArgumentResolver getArgumentResolver() {
+    return new PageableHandlerMethodArgumentResolver();
+  }
 
-    @Test
-    void createShouldReturnCreatedProductIdWhenRequestIsValid() throws Exception {
-        ProductCreateRequest request = ProductCreateRequest.builder()
-                .name("Product1")
-                .productNumber(BigInteger.valueOf(1111))
-                .info("Test Info")
-                .category(Category.BOOKS)
-                .price(BigDecimal.valueOf(1111))
-                .amount(BigDecimal.valueOf(1111))
-                .build();
-        ImmutableProductCreateDetails createDetails = ImmutableProductCreateDetails.builder()
-                .name(request.getName())
-                .productNumber(request.getProductNumber())
-                .info(request.getInfo())
-                .category(request.getCategory())
-                .price(request.getPrice())
-                .amount(request.getAmount())
-                .lastUpdateTime(LocalDateTime.now())
-                .build();
-        UUID createdId = UUID.randomUUID();
+  @Override
+  protected Object getExceptionHandler() {
+    return new GlobalExceptionHandler();
+  }
 
-        when(conversionService.convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class)))
-                .thenReturn(createDetails);
-        when(productService.create(createDetails)).thenReturn(createdId);
+  @Test
+  void createShouldReturnCreatedProductIdWhenRequestIsValid() throws Exception {
+    final ImmutableProductCreateDetails immutableCreateDetails = ObjectMother.immutableProductCreateDetails().build();
+    final ProductCreateRequest createRequest = ObjectMother.productCreateRequest().build();
+    when(conversionServiceMock.convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class)))
+            .thenReturn(immutableCreateDetails);
+    when(productServiceMock.create(immutableCreateDetails)).thenReturn(expectedId);
 
-        mockMvc.perform(post(BASE_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(content().json(objectMapper.writeValueAsString(createdId.toString())));
+    final String result = mockMvc.perform(post(BASE_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(createRequest)))
+            .andExpect(status().isCreated())
+            .andReturn().getResponse().getContentAsString();
+    final UUID actual = objectMapper.readValue(result, UUID.class);
 
-        verify(conversionService).convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class));
-        verify(productService).create(createDetails);
-    }
+    assertEquals(expectedId, actual);
+    verify(conversionServiceMock).convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class));
+    verify(productServiceMock).create(immutableCreateDetails);
+  }
 
-    @Test
-    void createShouldReturnExceptionWhenRequestIsInvalid() throws Exception {
-        ProductCreateRequest request = ProductCreateRequest.builder()
-                .name("Product1")
-                .productNumber(BigInteger.valueOf(1111))
-                .info("Test Info")
-                .category(Category.BOOKS)
-                .price(BigDecimal.valueOf(1111))
-                .amount(BigDecimal.valueOf(-1111))
-                .build();
+  @Test
+  void createShouldReturnErrorDetailsWhenRequestIsInvalidByOneField() throws Exception {
+    final ProductCreateRequest invalidCreateRequest = ObjectMother.productCreateRequest()
+            .withPrice(BigDecimal.valueOf(-1234))
+            .build();
 
-        ImmutableProductCreateDetails createDetails = ImmutableProductCreateDetails.builder()
-                .name(request.getName())
-                .productNumber(request.getProductNumber())
-                .info(request.getInfo())
-                .category(request.getCategory())
-                .price(request.getPrice())
-                .amount(request.getAmount())
-                .lastUpdateTime(LocalDateTime.now())
-                .build();
+    final String result = mockMvc.perform(post(BASE_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(invalidCreateRequest)))
+            .andExpect(status().isBadRequest())
+            .andReturn().getResponse().getContentAsString();
+    final ErrorDetails actual = objectMapper.readValue(result, ErrorDetails.class);
+    final String actualMessage = actual.getMessage();
 
-        when(conversionService.convert(any(ProductCreateRequest.class), eq(ImmutableProductCreateDetails.class)))
-                .thenReturn(createDetails);
+    assertEquals("Price must be 0 or greater!", actualMessage);
+  }
 
-        mockMvc.perform(post(BASE_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Amount must be 0 or greater!"));
-    }
+  @Test
+  void createShouldReturnErrorDetailsWhenRequestIsInvalidBySeveralFields() throws Exception {
+    final ProductCreateRequest invalidCreateRequest = ObjectMother.productCreateRequest()
+            .withName("Product".repeat(40))
+            .withPrice(BigDecimal.valueOf(-1234))
+            .build();
 
-    @Test
-    void findByIdShouldReturnProductDetailsWhenProductExists() throws Exception {
-        UUID id = UUID.randomUUID();
+    final String result = mockMvc.perform(post(BASE_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(invalidCreateRequest)))
+            .andExpect(status().isBadRequest())
+            .andReturn().getResponse().getContentAsString();
+    final ErrorDetails actual = objectMapper.readValue(result, ErrorDetails.class);
+    final String actualMessage = actual.getMessage();
 
-        ProductData productData = ProductData.builder()
-                .id(id)
-                .name("Product1")
-                .productNumber(BigInteger.valueOf(1111))
-                .info("Info1")
-                .category(Category.BOOKS)
-                .price(BigDecimal.valueOf(1111))
-                .amount(BigDecimal.valueOf(1111))
-                .lastAmountUpdate(LocalDateTime.now())
-                .creationTime(LocalDate.now())
-                .build();
+    assertThat(actualMessage).contains("Name must not be blank or exceed 255 characters!");
+    assertThat(actualMessage).contains("Price must be 0 or greater!");
+  }
 
-        ProductDataResponse response = ProductDataResponse.builder()
-                .id(productData.getId())
-                .name(productData.getName())
-                .productNumber(productData.getProductNumber())
-                .info(productData.getInfo())
-                .category(productData.getCategory())
-                .price(productData.getPrice())
-                .amount(productData.getAmount())
-                .lastAmountUpdate(productData.getLastAmountUpdate())
-                .creationTime(productData.getCreationTime())
-                .build();
+  @Test
+  void findByIdShouldReturnProductDetailsWhenProductExists() throws Exception {
+    final ProductData data = ObjectMother.productData().build();
+    final ProductDataResponse dataResponse = ObjectMother.productDataResponse().build();
 
-        when(productService.findById(id)).thenReturn(productData);
-        when(conversionService.convert(any(ProductData.class), eq(ProductDataResponse.class))).thenReturn(response);
+    when(productServiceMock.findById(expectedId)).thenReturn(data);
+    when(conversionServiceMock.convert(any(ProductData.class), eq(ProductDataResponse.class))).thenReturn(dataResponse);
 
-        mockMvc.perform(get(BASE_URL + "/{id}", id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(productData.getId().toString()))
-                .andExpect(jsonPath("$.name").value(productData.getName()));
+    final String result = mockMvc.perform(get(BASE_URL + "/{id}", expectedId))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+    final ProductDataResponse actual = objectMapper.readValue(result, ProductDataResponse.class);
 
-        verify(productService).findById(id);
-        verify(conversionService).convert(any(ProductData.class), eq(ProductDataResponse.class));
-    }
+    assertEquals(dataResponse, actual);
+    verify(productServiceMock).findById(expectedId);
+    verify(conversionServiceMock).convert(any(ProductData.class), eq(ProductDataResponse.class));
+  }
 
-    @Test
-    void findByIdShouldReturnExceptionWhenProductNotExists() throws Exception {
-        UUID id = UUID.randomUUID();
+  @Test
+  void findByIdShouldReturnErrorDetailsWhenProductNotExists() throws Exception {
+    when(productServiceMock.findById(expectedId)).thenThrow(new ProductNotFoundException(expectedId));
 
-        when(productService.findById(id)).thenThrow(new ProductNotFoundException(id));
+    final String result = mockMvc.perform(get(BASE_URL + "/{id}", expectedId))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+    final ErrorDetails actual = objectMapper.readValue(result, ErrorDetails.class);
+    final String actualMessage = actual.getMessage();
 
-        mockMvc.perform(get(BASE_URL + "/{id}", id))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message")
-                        .value("The product with ID " + id + " was not found."));
-    }
+    assertEquals("The product with ID " + expectedId + " was not found.", actualMessage);
+  }
 
-    @Test
-    void updateShouldReturnUpdatedProductIdWhenRequestIsValid() throws Exception {
-        UUID productId = UUID.randomUUID();
-        ProductUpdateRequest updateRequest = ProductUpdateRequest.builder()
-                .productNumber(BigInteger.valueOf(2312))
-                .info("Updated Info")
-                .category(Category.ELECTRONICS)
-                .price(BigDecimal.valueOf(1234))
-                .amount(BigDecimal.valueOf(10))
-                .build();
+  @Test
+  void updateShouldReturnUpdatedProductIdWhenRequestIsValid() throws Exception {
+    final ProductUpdateRequest updateRequest = ObjectMother.productUpdateRequest().build();
+    final ImmutableProductUpdateDetails immutableUpdateDetails = ObjectMother.immutableProductUpdateDetails().build();
+    when(conversionServiceMock.convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class)))
+            .thenReturn(immutableUpdateDetails);
+    when(productServiceMock.update(expectedId, immutableUpdateDetails)).thenReturn(expectedId);
 
-        ImmutableProductUpdateDetails updateDetails = ImmutableProductUpdateDetails.builder()
-                .productNumber(updateRequest.getProductNumber())
-                .info(updateRequest.getInfo())
-                .category(updateRequest.getCategory())
-                .price(updateRequest.getPrice())
-                .amount(updateRequest.getAmount())
-                .build();
+    final String result = mockMvc.perform(put(BASE_URL + "/{id}", expectedId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updateRequest)))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+    final UUID actual = objectMapper.readValue(result, UUID.class);
 
-        when(conversionService.convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class)))
-                .thenReturn(updateDetails);
-        when(productService.update(productId, updateDetails)).thenReturn(productId);
+    assertEquals(expectedId, actual);
+    verify(conversionServiceMock).convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class));
+    verify(productServiceMock).update(expectedId, immutableUpdateDetails);
+  }
 
-        mockMvc.perform(put(BASE_URL + "/{id}", productId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(productId.toString())));
+  @Test
+  void updateShouldReturnErrorDetailsWhenRequestIsNotValid() throws Exception {
+    final ProductUpdateRequest updateRequest = ObjectMother.productUpdateRequest()
+            .withAmount(BigDecimal.valueOf(-1234))
+            .build();
 
-        verify(conversionService).convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class));
-        verify(productService).update(productId, updateDetails);
-    }
+    final String result = mockMvc.perform(put(BASE_URL + "/{id}", expectedId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updateRequest)))
+            .andExpect(status().isBadRequest())
+            .andReturn().getResponse().getContentAsString();
+    final ErrorDetails actual = objectMapper.readValue(result, ErrorDetails.class);
+    final String actualMessage = actual.getMessage();
 
-    @Test
-    void updateShouldReturnExceptionWhenRequestIsNotValid() throws Exception {
-        UUID productId = UUID.randomUUID();
-        ProductUpdateRequest updateRequest = ProductUpdateRequest.builder()
-                .productNumber(BigInteger.valueOf(2312))
-                .info("Updated Info")
-                .category(Category.ELECTRONICS)
-                .price(BigDecimal.valueOf(-1234))
-                .amount(BigDecimal.valueOf(10))
-                .build();
+    assertEquals("Amount must be 0 or greater!", actualMessage);
+  }
 
-        ImmutableProductUpdateDetails updateDetails = ImmutableProductUpdateDetails.builder()
-                .productNumber(updateRequest.getProductNumber())
-                .info(updateRequest.getInfo())
-                .category(updateRequest.getCategory())
-                .price(updateRequest.getPrice())
-                .amount(updateRequest.getAmount())
-                .build();
+  @Test
+  void findAllShouldReturnPagedProductsWhenProductsExist() throws Exception {
+    final UUID expectedId1 = UUID.randomUUID();
+    final UUID expectedId2 = UUID.randomUUID();
+    final ProductData data1 = ObjectMother.productData()
+            .withId(expectedId1)
+            .build();
+    final ProductData data2 = ObjectMother.productData()
+            .withId(expectedId2)
+            .build();
+    final ProductDataResponse dataResponse1 = ObjectMother.productDataResponse()
+            .withId(expectedId1)
+            .build();
+    final ProductDataResponse dataResponse2 = ObjectMother.productDataResponse()
+            .withId(expectedId1)
+            .build();
+    final Pageable pageable = PageRequest.of(0, 2);
+    final Page<ProductData> productPage = new PageImpl<>(List.of(data1, data2), pageable, 2);
+    when(productServiceMock.findAll(any(Pageable.class))).thenReturn(productPage);
+    when(conversionServiceMock.convert(data1, ProductDataResponse.class)).thenReturn(dataResponse1);
+    when(conversionServiceMock.convert(data2, ProductDataResponse.class)).thenReturn(dataResponse2);
 
-        when(conversionService.convert(any(ProductUpdateRequest.class), eq(ImmutableProductUpdateDetails.class)))
-                .thenReturn(updateDetails);
+    mockMvc.perform(get(BASE_URL)
+                    .param("page", "0")
+                    .param("size", "2")
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content[0].id").value(dataResponse1.getId().toString()))
+            .andExpect(jsonPath("$.content[0].name").value(dataResponse1.getName()))
+            .andExpect(jsonPath("$.content[1].id").value(dataResponse2.getId().toString()))
+            .andExpect(jsonPath("$.content[1].name").value(dataResponse2.getName()));
 
-        mockMvc.perform(put(BASE_URL + "/{id}", productId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Price must be 0 or greater!"));
-    }
+    verify(productServiceMock).findAll(any(Pageable.class));
+    verify(conversionServiceMock).convert(data1, ProductDataResponse.class);
+    verify(conversionServiceMock).convert(data2, ProductDataResponse.class);
+  }
 
-    @Test
-    void findAllShouldReturnPagedProductsWhenProductsExist() throws Exception {
-        UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
+  @Test
+  void deleteShouldReturnNoContentWhenProductDeleted() throws Exception {
+    mockMvc.perform(delete(BASE_URL + "/{id}", expectedId))
+            .andExpect(status().isNoContent());
 
-        ProductData productData1 = ProductData.builder()
-                .id(id1)
-                .name("Product1")
-                .productNumber(BigInteger.valueOf(1111))
-                .info("Info1")
-                .category(Category.BOOKS)
-                .price(BigDecimal.valueOf(1111))
-                .amount(BigDecimal.valueOf(1111))
-                .lastAmountUpdate(LocalDateTime.now())
-                .creationTime(LocalDate.now())
-                .build();
-        ProductData productData2 = ProductData.builder()
-                .id(id2)
-                .name("Product2")
-                .productNumber(BigInteger.valueOf(2222))
-                .info("Info2")
-                .category(Category.BOOKS)
-                .price(BigDecimal.valueOf(2222))
-                .amount(BigDecimal.valueOf(2222))
-                .lastAmountUpdate(LocalDateTime.now())
-                .creationTime(LocalDate.now())
-                .build();
+    verify(productServiceMock).delete(expectedId);
+  }
 
-        ProductDataResponse response1 = ProductDataResponse.builder()
-                .id(productData1.getId())
-                .name(productData1.getName())
-                .productNumber(productData1.getProductNumber())
-                .info(productData1.getInfo())
-                .category(productData1.getCategory())
-                .price(productData1.getPrice())
-                .amount(productData1.getAmount())
-                .lastAmountUpdate(productData1.getLastAmountUpdate())
-                .creationTime(productData1.getCreationTime())
-                .build();
-        ProductDataResponse response2 = ProductDataResponse.builder()
-                .id(productData2.getId())
-                .name(productData2.getName())
-                .productNumber(productData2.getProductNumber())
-                .info(productData2.getInfo())
-                .category(productData2.getCategory())
-                .price(productData2.getPrice())
-                .amount(productData2.getAmount())
-                .lastAmountUpdate(productData2.getLastAmountUpdate())
-                .creationTime(productData2.getCreationTime())
-                .build();
+  @Test
+  void deleteShouldReturnErrorDetailsWhenProductNotExists() throws Exception {
+    doThrow(new ProductNotFoundException(expectedId)).when(productServiceMock).delete(expectedId);
 
-        Pageable pageable = PageRequest.of(0, 2);
-        Page<ProductData> productPage = new PageImpl<>(List.of(productData1, productData2), pageable, 2);
+    final String result = mockMvc.perform(delete(BASE_URL + "/{id}", expectedId))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+    final ErrorDetails actual = objectMapper.readValue(result, ErrorDetails.class);
+    final String actualMessage = actual.getMessage();
 
-        when(productService.findAll(any(Pageable.class))).thenReturn(productPage);
-        when(conversionService.convert(productData1, ProductDataResponse.class)).thenReturn(response1);
-        when(conversionService.convert(productData2, ProductDataResponse.class)).thenReturn(response2);
-
-        mockMvc.perform(get(BASE_URL)
-                        .param("page", "0")
-                        .param("size", "2")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].id").value(response1.getId().toString()))
-                .andExpect(jsonPath("$.content[0].name").value(response1.getName()))
-                .andExpect(jsonPath("$.content[1].id").value(response2.getId().toString()))
-                .andExpect(jsonPath("$.content[1].name").value(response2.getName()));
-
-        verify(productService).findAll(any(Pageable.class));
-        verify(conversionService).convert(productData1, ProductDataResponse.class);
-        verify(conversionService).convert(productData2, ProductDataResponse.class);
-    }
-
-
-    @Test
-    void deleteShouldReturnNoContentWhenProductDeleted() throws Exception {
-        UUID productId = UUID.randomUUID();
-
-        mockMvc.perform(delete(BASE_URL + "/{id}", productId))
-                .andExpect(status().isNoContent());
-
-        verify(productService).delete(productId);
-    }
-
-    @Test
-    void deleteShouldReturnExceptionWhenProductNotExists() throws Exception {
-        UUID productId = UUID.randomUUID();
-
-        doThrow(new ProductNotFoundException(productId)).when(productService).delete(productId);
-
-        mockMvc.perform(delete(BASE_URL + "/{id}", productId))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message")
-                        .value("The product with ID " + productId + " was not found."));
-    }
-
-
+    assertEquals("The product with ID " + expectedId + " was not found.", actualMessage);
+  }
 }

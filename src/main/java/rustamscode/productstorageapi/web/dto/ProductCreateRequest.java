@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import rustamscode.productstorageapi.persistance.entity.product.Category;
+import rustamscode.productstorageapi.persistance.enumeration.Category;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -20,16 +20,16 @@ import java.math.BigInteger;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductCreateRequest {
-    @NotEmpty
-    @Size(min = 1, max = 255, message = "Name must not be empty or exceed 255 characters!")
+    @NotBlank
+    @Size(min = 1, max = 255, message = "Name must not be blank or exceed 255 characters!")
     String name;
 
     @NotNull
     @Min(value = 0, message = "Product number must be 0 or greater!")
     BigInteger productNumber;
 
-    @NotEmpty
-    @Size(min = 1, max = 1000, message = "Info must not be empty or exceed 1000 characters!")
+    @NotBlank
+    @Size(min = 1, max = 1000, message = "Info must not be blank or exceed 1000 characters!")
     String info;
 
     @NotNull(message = "Category must not be null!")
