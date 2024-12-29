@@ -1,26 +1,30 @@
 package rustamscode.productstorageapi.service;
 
-import jakarta.validation.Valid;
+import jakarta.persistence.criteria.Predicate;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import rustamscode.productstorageapi.persistance.entity.product.ProductEntity;
-import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
-import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
-import rustamscode.productstorageapi.service.dto.ProductData;
 import rustamscode.productstorageapi.exception.NonUniqueProductNumberException;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
+import rustamscode.productstorageapi.persistance.entity.product.ProductEntity;
 import rustamscode.productstorageapi.persistance.repository.ProductRepository;
+import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
+import rustamscode.productstorageapi.service.dto.ImmutableProductFilterDetails;
+import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
+import rustamscode.productstorageapi.service.dto.ProductData;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -52,11 +56,12 @@ public class ProductServiceImpl implements ProductService {
      * @throws IllegalArgumentException        if the provided request is null
      * @throws NonUniqueProductNumberException if the product number is not unique
      */
-    public UUID create(@Valid final ImmutableProductCreateDetails request) {
+    @Override
+    public UUID create(final ImmutableProductCreateDetails request) {
         Assert.notNull(request, "Request must not be null");
 
-        ProductEntity product = conversionService.convert(request, ProductEntity.class);
-        BigInteger productNumber = product.getProductNumber();
+        final ProductEntity product = conversionService.convert(request, ProductEntity.class);
+        final BigInteger productNumber = product.getProductNumber();
 
         productRepository.findByProductNumber(productNumber)
                 .ifPresent(p -> {
@@ -74,10 +79,11 @@ public class ProductServiceImpl implements ProductService {
      * @throws IllegalArgumentException if the provided id is null
      * @throws ProductNotFoundException if no product is found with the given id
      */
+    @Override
     public ProductData findById(final UUID id) {
         Assert.notNull(id, "Id must not be null");
 
-        ProductEntity product = productRepository.findById(id)
+        final ProductEntity product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
 
         return conversionService.convert(product, ProductData.class);
@@ -104,15 +110,15 @@ public class ProductServiceImpl implements ProductService {
      * @throws ProductNotFoundException        if no product is found with the given id
      * @throws NonUniqueProductNumberException if the new product number is not unique
      */
-    @Transactional
+    @Override
     public UUID update(final UUID id, final ImmutableProductUpdateDetails request) {
         Assert.notNull(id, "Id must not be null");
         Assert.notNull(request, "Request must not be null");
 
-        ProductEntity product = productRepository.findById(id)
+        ProductEntity product = productRepository.findByIdLocked(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
 
-        BigInteger newProductNumber = request.getProductNumber();
+        final BigInteger newProductNumber = request.getProductNumber();
 
         if (productRepository.existsByProductNumber(newProductNumber)
                 && !newProductNumber.equals(product.getProductNumber())) {
@@ -141,6 +147,7 @@ public class ProductServiceImpl implements ProductService {
      * @throws IllegalArgumentException if the provided id is null
      * @throws ProductNotFoundException if no product is found with the given id
      */
+    @Override
     public void delete(final UUID id) {
         Assert.notNull(id, "Id must not be null");
 
@@ -151,4 +158,31 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(id);
         log.info("Product deleted with id: {}", id);
     }
+
+    @Override
+    public Page<ProductData> searchProducts(final ImmutableProductFilterDetails filterDetails) {
+        final PageRequest pageRequest = PageRequest.of(filterDetails.getPage(), filterDetails.getSize());
+
+        final Specification<ProductEntity> specification = (root, query, criteriaBuilder) ->
+        {
+            final List<Predicate> predicates = new ArrayList<>();
+
+            if (filterDetails.getName() != null) {
+                predicates.add(criteriaBuilder.like(root.get("name"), filterDetails.getName()));
+            }
+            if (filterDetails.getPrice() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), filterDetails.getPrice()));
+            }
+            if (filterDetails.getAmount() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("amount"), filterDetails.getAmount()));
+            }
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return productRepository.findAll(specification, pageRequest)
+                .map(product -> conversionService.convert(product, ProductData.class));
+
+    }
+
+
 }

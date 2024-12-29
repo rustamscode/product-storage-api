@@ -1,8 +1,10 @@
 package rustamscode.productstorageapi.service.dto;
 
 import jakarta.validation.constraints.PastOrPresent;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Value;
+import lombok.experimental.FieldDefaults;
 import rustamscode.productstorageapi.persistance.entity.product.Category;
 
 import java.math.BigDecimal;
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 
 @Value
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ImmutableProductCreateDetails {
     String name;
     BigInteger productNumber;

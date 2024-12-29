@@ -1,23 +1,56 @@
 package rustamscode.productstorageapi.web.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
 import rustamscode.productstorageapi.web.dto.ProductDataResponse;
+import rustamscode.productstorageapi.web.dto.ProductFilterRequest;
 import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 
 import java.util.UUID;
 
+@Tag(name = "Product management API")
+@Validated
 public interface ProductController {
-    UUID create(@Valid @NotNull ProductCreateRequest productCreateRequest);
 
-    ProductDataResponse findById(UUID id);
+    @PostMapping
+    @Operation(summary = "Create a product")
+    @ResponseStatus(HttpStatus.CREATED)
+    UUID create(@Valid @NotNull @RequestBody final ProductCreateRequest productCreateRequest);
 
-    Page<ProductDataResponse> findAll(Pageable pageable);
+    @Operation(summary = "Find a product by ID")
+    @GetMapping("/{id}")
+    ProductDataResponse findById(@PathVariable final UUID id);
 
-    UUID update(UUID id, @Valid @NotNull ProductUpdateRequest productUpdateRequest);
+    @Operation(summary = "Find all products")
+    @GetMapping
+    Page<ProductDataResponse> findAll(@PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable);
 
-    void delete(UUID id);
+    @Operation(summary = "Update a product")
+    @PutMapping("/{id}")
+    UUID update(@PathVariable final UUID id,
+                @Valid @NotNull @RequestBody final ProductUpdateRequest productUpdateRequest);
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a product")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void delete(@PathVariable final UUID id);
+
+    @GetMapping("/search")
+    @Operation(summary = "Search products using filters")
+    Page<ProductDataResponse> searchProducts(@Valid ProductFilterRequest filterRequest);
 }

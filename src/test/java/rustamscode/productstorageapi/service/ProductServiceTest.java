@@ -136,7 +136,7 @@ class ProductServiceTest {
                 .price(product.getPrice())
                 .amount(BigDecimal.valueOf(2221))
                 .build();
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdLocked(productId)).thenReturn(Optional.of(product));
         when(productRepository.save(product)).thenReturn(product);
 
         UUID result = productService.update(productId, request);
@@ -148,7 +148,7 @@ class ProductServiceTest {
     @Test
     void updateProductThrowsProductNotFoundException() {
         ImmutableProductUpdateDetails request = mock(ImmutableProductUpdateDetails.class);
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+        when(productRepository.findByIdLocked(productId)).thenReturn(Optional.empty());
 
         assertThrows(ProductNotFoundException.class, () -> productService.update(productId, request));
     }
