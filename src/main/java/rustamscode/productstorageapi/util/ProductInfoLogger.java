@@ -17,7 +17,7 @@ import java.sql.SQLException;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductInfoLogger {
 
-  private final String PRICE_UPDATE_LOGFILE = "price_update_log";
+  final String PRICE_UPDATE_LOGFILE = "price_update_log";
 
   public void logProductPriceUpdateInfo(ResultSet resultSet) {
     try (BufferedWriter writer = Files.newBufferedWriter(Path.of(PRICE_UPDATE_LOGFILE))) {
@@ -28,8 +28,8 @@ public class ProductInfoLogger {
 
     } catch (IOException | SQLException e) {
       log.error(
-              "There was a problem logging product price update info: {}",
-              e.getMessage()
+          "There was a problem logging product price update info: {}",
+          e.getMessage()
       );
       throw new RuntimeException(e);
     }
@@ -37,16 +37,16 @@ public class ProductInfoLogger {
 
   private String buildString(final ResultSet resultSet) throws SQLException {
     return String.join(" ",
-            resultSet.getString("id"),
-            resultSet.getString("name"),
-            resultSet.getString("product_number"),
-            resultSet.getString("info"),
-            resultSet.getString("category"),
-            resultSet.getString("price"),
-            resultSet.getString("amount"),
-            resultSet.getString("last_amount_update"),
-            resultSet.getString("creation_time"),
-            resultSet.getString("version"));
+        resultSet.getString("id"),
+        resultSet.getString("name"),
+        resultSet.getString("product_number"),
+        resultSet.getString("info"),
+        resultSet.getString("category"),
+        resultSet.getString("price"),
+        resultSet.getString("amount"),
+        resultSet.getString("last_amount_update"),
+        resultSet.getString("creation_time"),
+        resultSet.getString("version"));
   }
 }
 

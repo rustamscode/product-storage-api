@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAspectJAutoProxy
 public class ProductStorageApiApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ProductStorageApiApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(ProductStorageApiApplication.class, args);
+  }
 
 }
