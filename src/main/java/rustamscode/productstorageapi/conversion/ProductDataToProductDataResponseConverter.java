@@ -3,7 +3,7 @@ package rustamscode.productstorageapi.conversion;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import rustamscode.productstorageapi.service.dto.ProductData;
-import rustamscode.productstorageapi.web.dto.ProductDataResponse;
+import rustamscode.productstorageapi.web.dto.response.ProductDataResponse;
 
 @Component
 public class ProductDataToProductDataResponseConverter implements Converter<ProductData, ProductDataResponse> {

@@ -1,4 +1,4 @@
-package rustamscode.productstorageapi.currency;
+package rustamscode.productstorageapi.provider;
 
 import lombok.AccessLevel;
 import lombok.Data;

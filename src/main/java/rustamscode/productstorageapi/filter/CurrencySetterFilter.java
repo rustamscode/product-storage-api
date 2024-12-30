@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import rustamscode.productstorageapi.currency.CurrencyProvider;
+import rustamscode.productstorageapi.provider.CurrencyProvider;
 import rustamscode.productstorageapi.enumeration.Currency;
 
 import java.io.IOException;
@@ -26,11 +26,16 @@ public class CurrencySetterFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     Currency currency;
+    String currencyHeader = request.getHeader("currency");
+
+    if (currencyHeader == null) {
+      filterChain.doFilter(request, response);
+    }
 
     try {
-      currency = Currency.fromCurrencyName(request.getHeader("currency"));
+      currency = Currency.fromCurrencyName(currencyHeader);
     } catch (Exception e) {
-      log.error("Currency {} is not acceptable", request.getHeader("currency"));
+      log.error("Currency {} is not acceptable", currencyHeader);
       filterChain.doFilter(request, response);
       return;
     }
