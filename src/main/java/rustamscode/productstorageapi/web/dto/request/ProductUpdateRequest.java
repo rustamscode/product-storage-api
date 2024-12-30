@@ -1,6 +1,11 @@
-package rustamscode.productstorageapi.web.dto;
+package rustamscode.productstorageapi.web.dto.request;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,23 +18,19 @@ import java.math.BigInteger;
 /**
  * Request object for a controller layer.
  * This class contains the necessary fields and validation constraints
- * for passing product details to service layer.
+ * for passing product update details to service layer.
  */
 
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductCreateRequest {
-  @NotBlank
-  @Size(min = 1, max = 255, message = "Name must not be blank or exceed 255 characters!")
-  String name;
-
+public class ProductUpdateRequest {
   @NotNull
   @Min(value = 0, message = "Product number must be 0 or greater!")
   BigInteger productNumber;
 
   @NotBlank
-  @Size(min = 1, max = 1000, message = "Info must not be blank or exceed 1000 characters!")
+  @Size(min = 1, max = 1000, message = "Info must not be empty or exceed 1000 characters!")
   String info;
 
   @NotNull(message = "Category must not be null!")
