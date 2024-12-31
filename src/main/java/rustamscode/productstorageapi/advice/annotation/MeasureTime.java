@@ -1,4 +1,4 @@
-package rustamscode.productstorageapi.aspect.annotation;
+package rustamscode.productstorageapi.advice.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

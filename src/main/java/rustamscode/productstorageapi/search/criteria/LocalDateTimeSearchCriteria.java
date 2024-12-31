@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import rustamscode.productstorageapi.search.enumeration.OperationType;
+import rustamscode.productstorageapi.enumeration.OperationType;
 import rustamscode.productstorageapi.search.strategy.LocalDataTimePredicateStrategy;
 import rustamscode.productstorageapi.search.strategy.PredicateStrategy;
 
@@ -18,24 +18,24 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LocalDateTimeSearchCriteria implements SearchCriteria<LocalDateTime> {
 
-    final static PredicateStrategy STRATEGY = new LocalDataTimePredicateStrategy();
+  final static PredicateStrategy STRATEGY = new LocalDataTimePredicateStrategy();
 
-    final String field;
+  final String field;
 
-    @PastOrPresent
-    @NotNull(message = "The value must not be null!")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    final LocalDateTime value;
+  @PastOrPresent
+  @NotNull(message = "The value must not be null!")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+  final LocalDateTime value;
 
-    final String operationType;
+  final String operationType;
 
-    @Override
-    public PredicateStrategy getStrategy() {
-        return STRATEGY;
-    }
+  @Override
+  public PredicateStrategy getStrategy() {
+    return STRATEGY;
+  }
 
-    @Override
-    public OperationType getOperationType() {
-        return OperationType.fromOperation(operationType);
-    }
+  @Override
+  public OperationType getOperationType() {
+    return OperationType.fromOperation(operationType);
+  }
 }

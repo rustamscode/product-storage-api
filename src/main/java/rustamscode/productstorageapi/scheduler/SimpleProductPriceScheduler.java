@@ -21,24 +21,24 @@ import java.util.List;
 @ConditionalOnExpression("'${spring.scheduling.mode:none}'.equals('simple')")
 public class SimpleProductPriceScheduler implements ProductPriceScheduler {
 
-    final ProductRepository productRepository;
+  final ProductRepository productRepository;
 
-    @Value("${spring.scheduling.priceIncreasePercentage}")
-    BigDecimal increasePercentage;
+  @Value("${spring.scheduling.priceIncreasePercentage}")
+  BigDecimal increasePercentage;
 
-    @Transactional
-    @Scheduled(fixedRateString = "${spring.scheduling.period}")
-    public void increasePrice() {
-        log.info("Simple scheduler started");
+  @Transactional
+  @Scheduled(fixedRateString = "${spring.scheduling.period}")
+  public void increasePrice() {
+    log.info("Simple scheduler started");
 
-        List<ProductEntity> products = productRepository.findAll();
+    List<ProductEntity> products = productRepository.findAll();
 
-        products.forEach(product -> {
-            BigDecimal increase = product.getPrice().multiply(increasePercentage.divide(BigDecimal.valueOf(100)));
-            product.setPrice(product.getPrice().add(increase));
-        });
+    products.forEach(product -> {
+      BigDecimal increase = product.getPrice().multiply(increasePercentage.divide(BigDecimal.valueOf(100)));
+      product.setPrice(product.getPrice().add(increase));
+    });
 
-        productRepository.saveAll(products);
-        log.info("Simple scheduler finished");
-    }
+    productRepository.saveAll(products);
+    log.info("Simple scheduler finished");
+  }
 }
