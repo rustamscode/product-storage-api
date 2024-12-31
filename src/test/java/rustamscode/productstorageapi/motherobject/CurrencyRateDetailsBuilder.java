@@ -1,7 +1,7 @@
 package rustamscode.productstorageapi.motherobject;
 
 import lombok.Getter;
-import rustamscode.productstorageapi.service.dto.CurrencyRateDetails;
+import rustamscode.productstorageapi.interaction.dto.CurrencyRateDetails;
 
 import java.math.BigDecimal;
 

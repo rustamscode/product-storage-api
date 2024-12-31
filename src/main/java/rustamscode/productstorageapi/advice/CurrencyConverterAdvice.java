@@ -13,10 +13,10 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
-import rustamscode.productstorageapi.provider.CurrencyProvider;
-import rustamscode.productstorageapi.provider.CurrencyRateProvider;
+import rustamscode.productstorageapi.currency.CurrencyProvider;
+import rustamscode.productstorageapi.currency.CurrencyRateProvider;
 import rustamscode.productstorageapi.enumeration.Currency;
-import rustamscode.productstorageapi.web.dto.response.ProductDataResponse;
+import rustamscode.productstorageapi.web.dto.ProductDataResponse;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,7 +30,8 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
   final CurrencyProvider currencyProvider;
   final CurrencyRateProvider currencyRateProvider;
 
-  final ThreadLocal<BigDecimal> cachedCurrencyRate = new ThreadLocal<>();
+  Currency currency;
+  BigDecimal currencyRate;
 
   @Override
   public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
@@ -45,25 +46,19 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
                                 MediaType selectedContentType,
                                 Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                 ServerHttpRequest request, ServerHttpResponse response) {
-    try {
-      cacheCurrencyRate();
+    this.currency = currencyProvider.getCurrency();
+    this.currencyRate = currencyRateProvider.getCurrencyRate(currencyProvider.getCurrency());
 
-      if (body instanceof ProductDataResponse responseBody) {
-        return processResponse(responseBody);
-      } else if (body instanceof Page<?> responseBody) {
-        return processResponsePage((Page<ProductDataResponse>) responseBody);
-      }
-
-      return body;
-    } finally {
-      cachedCurrencyRate.remove();
+    if (body instanceof ProductDataResponse responseBody) {
+      return processResponse(responseBody);
+    } else if (body instanceof Page<?> responseBody) {
+      return processResponsePage((Page<ProductDataResponse>) responseBody);
     }
+
+    return body;
   }
 
   private ProductDataResponse processResponse(ProductDataResponse body) {
-    Currency currency = currencyProvider.getCurrency();
-    BigDecimal currencyRate = cachedCurrencyRate.get();
-
     BigDecimal newPrice = body.getPrice().divide(currencyRate, RoundingMode.HALF_UP);
     body.setPrice(newPrice);
     body.setCurrency(currency);
@@ -78,14 +73,6 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
         .toList();
 
     return new PageImpl<>(updatedContent, page.getPageable(), page.getSize());
-  }
-
-  private void cacheCurrencyRate() {
-    if (cachedCurrencyRate.get() == null) {
-      Currency currency = currencyProvider.getCurrency();
-      BigDecimal currencyRate = currencyRateProvider.getCurrencyRate(currency);
-      cachedCurrencyRate.set(currencyRate);
-    }
   }
 }
 

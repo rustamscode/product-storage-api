@@ -1,20 +1,22 @@
 package rustamscode.productstorageapi.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebClientConfig {
 
-  @Value("${currency-service.host}")
-  private String BASE_URL;
+  final private RestProperties restProperties;
 
   @Bean
   public WebClient webClient() {
+    final String baseUrl = restProperties.getCurrencyServiceClient().getHost();
+
     return WebClient.builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(baseUrl)
         .build();
   }
 }

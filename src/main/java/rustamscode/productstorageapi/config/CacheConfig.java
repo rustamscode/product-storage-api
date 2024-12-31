@@ -1,7 +1,7 @@
 package rustamscode.productstorageapi.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
@@ -12,24 +12,28 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableCaching
+@RequiredArgsConstructor
 public class CacheConfig {
 
-  @Value("${spring.cache.expiration-time}")
-  private Integer EXPIRATION_TIME;
-
-  @Value("${spring.cache.initial-capacity}")
-  private Integer INITIAL_CAPACITY;
+  private final RestProperties restProperties;
 
   @Bean
   public Caffeine<Object, Object> caffeineConfig() {
+    final Integer expirationTime = restProperties.getCurrencyServiceClient()
+        .getCache()
+        .getExpirationTime();
+    final Integer initialCapacity = restProperties.getCurrencyServiceClient()
+        .getCache()
+        .getInitialCapacity();
+
     return Caffeine.newBuilder()
-        .initialCapacity(INITIAL_CAPACITY)
-        .expireAfterAccess(EXPIRATION_TIME, TimeUnit.SECONDS);
+        .initialCapacity(initialCapacity)
+        .expireAfterAccess(expirationTime, TimeUnit.SECONDS);
   }
 
   @Bean
   public CacheManager cacheManager(Caffeine caffeine) {
-    CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
+    final CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
     caffeineCacheManager.setCaffeine(caffeine);
 
     return caffeineCacheManager;

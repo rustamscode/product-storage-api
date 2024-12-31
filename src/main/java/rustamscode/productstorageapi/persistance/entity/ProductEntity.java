@@ -24,7 +24,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Table(name = "product")
+@Table(name = "products")
 @Entity
 @Setter
 @Getter
@@ -69,7 +69,4 @@ public class ProductEntity {
   @Version
   @Column(name = "version")
   Integer version;
-
-  @Column(name = "is_available", nullable = false)
-  boolean isAvailable;
 }

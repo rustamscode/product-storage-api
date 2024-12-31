@@ -2,7 +2,8 @@ package rustamscode.productstorageapi.motherobject;
 
 import lombok.Getter;
 import rustamscode.productstorageapi.enumeration.Category;
-import rustamscode.productstorageapi.web.dto.response.ProductDataResponse;
+import rustamscode.productstorageapi.enumeration.Currency;
+import rustamscode.productstorageapi.web.dto.ProductDataResponse;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -21,6 +22,7 @@ public class ProductDataResponseBuilder {
   public static final BigDecimal DEFAULT_AMOUNT = BigDecimal.valueOf(1234);
   public static final LocalDateTime DEFAULT_LAST_AMOUNT_UPDATE = null;
   public static final LocalDate DEFAULT_CREATION_TIME = null;
+  public static final Currency DEFAULT_CURRENCY = Currency.RUB;
 
   private UUID id = DEFAULT_ID;
   private String name = DEFAULT_NAME;
@@ -31,6 +33,7 @@ public class ProductDataResponseBuilder {
   private BigDecimal amount = DEFAULT_AMOUNT;
   private LocalDateTime lastAmountUpdate = DEFAULT_LAST_AMOUNT_UPDATE;
   private LocalDate creationTime = DEFAULT_CREATION_TIME;
+  private Currency currency = DEFAULT_CURRENCY;
 
   private ProductDataResponseBuilder() {
   }
@@ -81,6 +84,11 @@ public class ProductDataResponseBuilder {
 
   public ProductDataResponseBuilder withCreationTime(final LocalDate creationTime) {
     this.creationTime = creationTime;
+    return this;
+  }
+
+  public ProductDataResponseBuilder withCurrency(final Currency currency) {
+    this.currency = currency;
     return this;
   }
 

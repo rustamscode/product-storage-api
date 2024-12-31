@@ -7,15 +7,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import rustamscode.productstorageapi.provider.CurrencyProvider;
+import rustamscode.productstorageapi.currency.CurrencyProvider;
 import rustamscode.productstorageapi.enumeration.Currency;
 
 import java.io.IOException;
+import java.util.Optional;
 
-@Slf4j
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
@@ -25,22 +24,9 @@ public class CurrencySetterFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    Currency currency;
-    String currencyHeader = request.getHeader("currency");
+    final Optional<String> currency = Optional.ofNullable(request.getHeader("currency"));
 
-    if (currencyHeader == null) {
-      filterChain.doFilter(request, response);
-    }
-
-    try {
-      currency = Currency.fromCurrencyName(currencyHeader);
-    } catch (Exception e) {
-      log.error("Currency {} is not acceptable", currencyHeader);
-      filterChain.doFilter(request, response);
-      return;
-    }
-
-    currencyProvider.setCurrency(currency);
+    currency.ifPresent(c -> currencyProvider.setCurrency(Currency.valueOf(c)));
     filterChain.doFilter(request, response);
   }
 }

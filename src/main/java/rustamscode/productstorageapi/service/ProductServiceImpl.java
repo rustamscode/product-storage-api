@@ -51,16 +51,16 @@ public class ProductServiceImpl implements ProductService {
   /**
    * Creates a new product based on the provided details.
    *
-   * @param details the details to create the product
+   * @param request the details to create the product
    * @return the unique identifier of the created product
    * @throws IllegalArgumentException        if the provided request is null
    * @throws NonUniqueProductNumberException if the product number is not unique
    */
   @Override
-  public UUID create(final ImmutableProductCreateDetails details) {
-    Assert.notNull(details, "Product must not be null");
+  public UUID create(final ImmutableProductCreateDetails request) {
+    Assert.notNull(request, "Request must not be null");
 
-    final ProductEntity product = conversionService.convert(details, ProductEntity.class);
+    final ProductEntity product = conversionService.convert(request, ProductEntity.class);
     final BigInteger productNumber = product.getProductNumber();
 
     productRepository.findByProductNumber(productNumber)
