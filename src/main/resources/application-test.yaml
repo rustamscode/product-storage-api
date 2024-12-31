@@ -10,3 +10,18 @@ spring:
       ddl-auto: create
   liquibase:
     enabled: false
+  cache:
+    expiration-time: 10 #sec
+    initial-capacity: 10
+
+  server:
+    port: 8080
+    servlet:
+      context-path: /app
+
+  currency-service:
+    host: http://localhost:8081
+    methods:
+      get-currency-rate: /currency-rate
+    files:
+      default-currency-rates: exchange-rate.json

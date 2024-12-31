@@ -15,8 +15,8 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.xml
     enabled: true
   scheduling:
-    mode: optimized
-    period: 60000
+    mode: none #optimized, simple, none
+    period: 60000 #ms
     priceIncreasePercentage: 10.1
 
 server:
@@ -24,7 +24,13 @@ server:
   servlet:
     context-path: /app
 
-file:
-  product-price-update-info: "price_update_log"
-
-
+rest:
+  currency-service-client:
+    host: http://localhost:8081
+    methods:
+      get-currency-rate: /currency-rate
+    files:
+      default-currency-rates: exchange-rate.json
+    cache:
+      expiration-time: 10 #sec
+      initial-capacity: 10
