@@ -1,4 +1,4 @@
-INSERT INTO product (id, name, product_number, info, category, price,
+INSERT INTO products (id, name, product_number, info, category, price,
                       amount, last_amount_update, creation_time, version, is_available)
 SELECT gen_random_uuid(),
        'Product ' || s.i::text,

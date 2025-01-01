@@ -19,7 +19,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Table(name = "ordered_product")
+@Table(name = "ordered_products")
 @Entity
 @Setter
 @Getter
@@ -42,9 +42,9 @@ public class OrderedProductEntity {
   @JoinColumn(name = "product_id", nullable = false)
   ProductEntity product;
 
-  @Column(name = "ordered_product_price", table = "ordered_product", nullable = false)
+  @Column(name = "ordered_product_price", table = "ordered_products", nullable = false)
   BigDecimal orderedProductPrice;
 
-  @Column(name = "ordered_product_amount", table = "ordered_product", nullable = false)
+  @Column(name = "ordered_product_amount", table = "ordered_products", nullable = false)
   BigDecimal orderedProductAmount;
 }

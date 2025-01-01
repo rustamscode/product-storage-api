@@ -8,7 +8,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import rustamscode.productstorageapi.exception.CustomerNotFoundException;
-import rustamscode.productstorageapi.exception.OutOfStockException;
+import rustamscode.productstorageapi.exception.InsufficientProductException;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
 import rustamscode.productstorageapi.exception.UnavailableProductException;
 import rustamscode.productstorageapi.persistance.entity.CustomerEntity;
@@ -46,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public UUID create(final Long customerId,
                      final ImmutableProductOrderDetails immutableProductOrderDetails) {
+    Assert.notNull(customerId, "Customer ID must not be null");
     Assert.notNull(immutableProductOrderDetails, "Order details must not be null");
 
     List<ImmutableOrderedProductObject> orderedProductObjects = immutableProductOrderDetails.getProducts();
@@ -79,13 +80,13 @@ public class OrderServiceImpl implements OrderService {
           ProductEntity product = productRepository.findById(productId)
               .orElseThrow(() -> new ProductNotFoundException(productId));
 
-          BigDecimal amountAfterOrder = product.getAmount().subtract(orderedProductObject.getAmount());
-          if (amountAfterOrder.compareTo(BigDecimal.ZERO) < 0) {
-            throw new OutOfStockException(productId);
+          if (!product.getIsAvailable()) {
+            throw new UnavailableProductException(productId);
           }
 
-          if (!product.isAvailable()) {
-            throw new UnavailableProductException(productId);
+          BigDecimal amountAfterOrder = product.getAmount().subtract(orderedProductObject.getAmount());
+          if (amountAfterOrder.compareTo(BigDecimal.ZERO) < 0) {
+            throw new InsufficientProductException(productId);
           }
 
           product.setAmount(amountAfterOrder);

@@ -3,7 +3,7 @@ package rustamscode.productstorageapi.motherobject;
 import lombok.Getter;
 import rustamscode.productstorageapi.enumeration.Category;
 import rustamscode.productstorageapi.enumeration.Currency;
-import rustamscode.productstorageapi.web.dto.ProductDataResponse;
+import rustamscode.productstorageapi.web.dto.response.ProductDataResponse;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -94,16 +94,17 @@ public class ProductDataResponseBuilder {
 
   public ProductDataResponse build() {
     return ProductDataResponse.builder()
-            .id(id)
-            .name(name)
-            .productNumber(productNumber)
-            .info(info)
-            .category(category)
-            .price(price)
-            .amount(amount)
-            .lastAmountUpdate(lastAmountUpdate)
-            .creationTime(creationTime)
-            .build();
+        .id(id)
+        .name(name)
+        .productNumber(productNumber)
+        .info(info)
+        .category(category)
+        .price(price)
+        .amount(amount)
+        .lastAmountUpdate(lastAmountUpdate)
+        .creationTime(creationTime)
+        .currency(currency)
+        .build();
   }
 
 }

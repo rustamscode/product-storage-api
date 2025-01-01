@@ -69,4 +69,7 @@ public class ProductEntity {
   @Version
   @Column(name = "version")
   Integer version;
+
+  @Column(name = "is_available", nullable = false)
+  Boolean isAvailable;
 }

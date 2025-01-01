@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import rustamscode.productstorageapi.currency.CurrencyProvider;
+import rustamscode.productstorageapi.provider.CurrencyProvider;
 import rustamscode.productstorageapi.enumeration.Currency;
 
 import java.io.IOException;

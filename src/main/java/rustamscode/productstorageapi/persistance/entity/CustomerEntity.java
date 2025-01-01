@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-@Table(name = "customer")
+@Table(name = "customers")
 @Entity
 @Setter
 @Getter

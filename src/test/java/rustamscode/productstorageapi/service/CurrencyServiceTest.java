@@ -15,8 +15,8 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import rustamscode.productstorageapi.interaction.dto.CurrencyRateDetails;
 import rustamscode.productstorageapi.motherobject.ObjectMother;
-import rustamscode.productstorageapi.service.dto.CurrencyRateDetails;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -83,6 +83,5 @@ public class CurrencyServiceTest {
             .bodyToMono(CurrencyRateDetails.class)
             .block());
   }
-
 }
 
