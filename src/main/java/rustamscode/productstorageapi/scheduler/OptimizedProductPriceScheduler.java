@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import rustamscode.productstorageapi.aspect.annotation.MeasureTime;
+import rustamscode.productstorageapi.advice.annotation.MeasureTime;
 import rustamscode.productstorageapi.util.ProductInfoLogger;
 
 import javax.sql.DataSource;
@@ -31,9 +31,9 @@ public class OptimizedProductPriceScheduler implements ProductPriceScheduler {
   final DataSource dataSource;
 
   final static String UPDATE_QUERY = """
-          UPDATE products SET price = price + (price * (? / 100)) 
-          RETURNING *;
-          """;
+      UPDATE products SET price = price + (price * (? / 100)) 
+      RETURNING *;
+      """;
   final static String LOCK_QUERY = "LOCK TABLE products IN EXCLUSIVE MODE;";
 
   @Value("${spring.scheduling.priceIncreasePercentage}")

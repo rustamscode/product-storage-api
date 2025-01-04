@@ -7,18 +7,18 @@ import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
 
 @Component
 public class ImmutableProductCreateDetailsToProductConverter implements
-        Converter<ImmutableProductCreateDetails, ProductEntity> {
+    Converter<ImmutableProductCreateDetails, ProductEntity> {
 
   @Override
   public ProductEntity convert(ImmutableProductCreateDetails immutableProductCreateRequest) {
     return ProductEntity.builder()
-            .name(immutableProductCreateRequest.getName())
-            .productNumber(immutableProductCreateRequest.getProductNumber())
-            .info(immutableProductCreateRequest.getInfo())
-            .category(immutableProductCreateRequest.getCategory())
-            .price(immutableProductCreateRequest.getPrice())
-            .amount(immutableProductCreateRequest.getAmount())
-            .lastAmountUpdate(immutableProductCreateRequest.getLastAmountUpdate())
-            .build();
+        .name(immutableProductCreateRequest.getName())
+        .productNumber(immutableProductCreateRequest.getProductNumber())
+        .info(immutableProductCreateRequest.getInfo())
+        .category(immutableProductCreateRequest.getCategory())
+        .price(immutableProductCreateRequest.getPrice())
+        .amount(immutableProductCreateRequest.getAmount())
+        .lastAmountUpdate(immutableProductCreateRequest.getLastAmountUpdate())
+        .build();
   }
 }
