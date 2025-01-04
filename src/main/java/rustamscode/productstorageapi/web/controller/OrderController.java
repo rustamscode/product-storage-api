@@ -49,11 +49,12 @@ public interface OrderController {
               @RequestHeader final Long customerId);
 
   @PostMapping("/{id}/confirm")
-  @Operation(summary = "Confirms an order")
+  @Operation(summary = "Confirm an order")
   void confirm(@PathVariable final UUID id,
                @RequestHeader final Long customerId);
 
   @PatchMapping("{id}/status")
+  @Operation(summary = "Check order status")
   UUID updateStatus(@PathVariable final UUID id,
                     @RequestHeader final Long customerId,
                     @RequestBody @NotNull final OrderStatus status);

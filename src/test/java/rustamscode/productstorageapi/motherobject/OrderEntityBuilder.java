@@ -20,14 +20,14 @@ public class OrderEntityBuilder {
   public final static List<OrderedProductEntity> DEFAULT_ORDERED_PRODUCTS = Arrays.asList(
       OrderedProductEntity.builder()
           .order(ObjectMother.orderEntity().build())
-          .orderedProductPrice(BigDecimal.valueOf(1234))
-          .orderedProductAmount(BigDecimal.valueOf(1234))
+          .price(BigDecimal.valueOf(1234))
+          .amount(BigDecimal.valueOf(1234))
           .product(ObjectMother.productEntity().build())
           .build(),
       OrderedProductEntity.builder()
           .order(ObjectMother.orderEntity().build())
-          .orderedProductPrice(BigDecimal.valueOf(1234))
-          .orderedProductAmount(BigDecimal.valueOf(1234))
+          .price(BigDecimal.valueOf(1234))
+          .amount(BigDecimal.valueOf(1234))
           .product(ObjectMother.productEntity().build())
           .build()
   );

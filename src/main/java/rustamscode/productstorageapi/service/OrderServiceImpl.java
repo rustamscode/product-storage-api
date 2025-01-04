@@ -19,6 +19,7 @@ import rustamscode.productstorageapi.persistance.entity.CustomerEntity;
 import rustamscode.productstorageapi.persistance.entity.OrderEntity;
 import rustamscode.productstorageapi.persistance.entity.OrderedProductEntity;
 import rustamscode.productstorageapi.persistance.entity.ProductEntity;
+import rustamscode.productstorageapi.persistance.entity.key.OrderedProductEntityKey;
 import rustamscode.productstorageapi.persistance.repository.CustomerRepository;
 import rustamscode.productstorageapi.persistance.repository.OrderRepository;
 import rustamscode.productstorageapi.persistance.repository.OrderedProductRepository;
@@ -66,7 +67,10 @@ public class OrderServiceImpl implements OrderService {
     final OrderEntity savedOrder = orderRepository.save(order);
     log.info("Order was saved without products");
 
-    orderedProducts.forEach(product -> product.setOrder(savedOrder));
+    orderedProducts.forEach(orderedProduct -> {
+      orderedProduct.setOrder(savedOrder);
+      orderedProduct.setId(new OrderedProductEntityKey(orderedProduct.getProduct().getId(), order.getId()));
+    });
     orderedProductRepository.saveAll(orderedProducts);
     log.info("Ordered products were saved");
 
@@ -98,10 +102,16 @@ public class OrderServiceImpl implements OrderService {
       throw new IllegalOrderAccessException(order.getOrderStatus());
     }
 
-    final List<OrderedProductEntity> orderedProducts = mapToOrderedProducts(orderedProductObjects);
-    orderedProducts.forEach(product -> product.setOrder(order));
+    final List<OrderedProductEntity> updatedOrderedProducts = filterUpdatedOrderedProductsFromExisting(
+        mapToOrderedProducts(orderedProductObjects), order
+    );
 
-    order.getOrderedProducts().addAll(orderedProducts);
+    updatedOrderedProducts.forEach(orderedProduct -> {
+      orderedProduct.setOrder(order);
+      orderedProduct.setId(new OrderedProductEntityKey(orderedProduct.getProduct().getId(), order.getId()));
+    });
+
+    order.getOrderedProducts().addAll(updatedOrderedProducts);
     orderRepository.save(order);
     log.info("Updated order was saved");
 
@@ -151,7 +161,7 @@ public class OrderServiceImpl implements OrderService {
     final List<OrderedProductEntity> orderedProducts = order.getOrderedProducts();
     orderedProducts.forEach(orderedProduct -> {
       final ProductEntity product = orderedProduct.getProduct();
-      final BigDecimal newAmount = product.getAmount().add(orderedProduct.getOrderedProductAmount());
+      final BigDecimal newAmount = product.getAmount().add(orderedProduct.getAmount());
       product.setAmount(newAmount);
       productRepository.save(product);
     });
@@ -208,9 +218,28 @@ public class OrderServiceImpl implements OrderService {
 
           return OrderedProductEntity.builder()
               .product(product)
-              .orderedProductPrice(product.getPrice())
-              .orderedProductAmount(orderedProductObject.getAmount())
+              .price(product.getPrice())
+              .amount(orderedProductObject.getAmount())
               .build();
+        })
+        .collect(Collectors.toList());
+  }
+
+  private List<OrderedProductEntity> filterUpdatedOrderedProductsFromExisting(final List<OrderedProductEntity> orderedProducts,
+                                                                              final OrderEntity order) {
+    return orderedProducts.stream().filter(orderedProduct -> {
+          final OrderedProductEntityKey orderedProductKey = new OrderedProductEntityKey(
+              orderedProduct.getProduct().getId(), order.getId()
+          );
+
+          return orderedProductRepository.findById(orderedProductKey)
+              .map(existing -> {
+                final BigDecimal newAmount = existing.getAmount().add(orderedProduct.getAmount());
+                existing.setAmount(newAmount);
+                existing.setPrice(orderedProduct.getPrice());
+                orderedProductRepository.save(existing);
+                return false;
+              }).orElse(true);
         })
         .collect(Collectors.toList());
   }

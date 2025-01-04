@@ -1,10 +1,8 @@
 package rustamscode.productstorageapi.persistance.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -15,13 +13,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.UuidGenerator;
+import rustamscode.productstorageapi.persistance.entity.key.OrderedProductEntityKey;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Table(name = "ordered_product")
 @Entity
@@ -33,22 +27,20 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderedProductEntity {
 
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  UUID id;
+  @EmbeddedId
+  OrderedProductEntityKey id;
 
   @ManyToOne()
-  @JoinColumn(name = "order_id", nullable = false)
+  @JoinColumn(name = "order_id", nullable = false, insertable = false, updatable = false)
   OrderEntity order;
 
   @ManyToOne()
-  @JoinColumn(name = "product_id", nullable = false)
+  @JoinColumn(name = "product_id", nullable = false, insertable = false, updatable = false)
   ProductEntity product;
 
-  @Column(name = "ordered_product_price", table = "ordered_products", nullable = false)
-  BigDecimal orderedProductPrice;
+  @Column(name = "price", table = "ordered_product", nullable = false)
+  BigDecimal price;
 
-  @Column(name = "ordered_product_amount", table = "ordered_products", nullable = false)
-  BigDecimal orderedProductAmount;
+  @Column(name = "amount", table = "ordered_product", nullable = false)
+  BigDecimal amount;
 }
