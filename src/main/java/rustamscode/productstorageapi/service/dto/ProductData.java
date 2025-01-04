@@ -2,7 +2,8 @@ package rustamscode.productstorageapi.service.dto;
 
 import lombok.Builder;
 import lombok.Value;
-import rustamscode.productstorageapi.persistance.enumeration.Category;
+import rustamscode.productstorageapi.enumeration.Currency;
+import rustamscode.productstorageapi.enumeration.Category;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -19,13 +20,14 @@ import java.util.UUID;
 @Value
 @Builder
 public class ProductData {
-    UUID id;
-    String name;
-    BigInteger productNumber;
-    String info;
-    Category category;
-    BigDecimal price;
-    BigDecimal amount;
-    LocalDateTime lastAmountUpdate;
-    LocalDate creationTime;
+  UUID id;
+  String name;
+  BigInteger productNumber;
+  String info;
+  Category category;
+  BigDecimal price;
+  BigDecimal amount;
+  LocalDateTime lastAmountUpdate;
+  LocalDate creationTime;
+  Currency currency;
 }

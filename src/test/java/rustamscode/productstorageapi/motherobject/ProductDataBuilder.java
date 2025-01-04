@@ -2,6 +2,7 @@ package rustamscode.productstorageapi.motherobject;
 
 import lombok.Getter;
 import rustamscode.productstorageapi.enumeration.Category;
+import rustamscode.productstorageapi.enumeration.Currency;
 import rustamscode.productstorageapi.service.dto.ProductData;
 
 import java.math.BigDecimal;
@@ -21,6 +22,7 @@ public class ProductDataBuilder {
   public static final BigDecimal DEFAULT_AMOUNT = BigDecimal.valueOf(1234);
   public static final LocalDateTime DEFAULT_LAST_AMOUNT_UPDATE = null;
   public static final LocalDate DEFAULT_CREATION_TIME = null;
+  public static final Currency DEFAULT_CURRENCY = Currency.RUB;
 
   private UUID id = DEFAULT_ID;
   private String name = DEFAULT_NAME;
@@ -31,6 +33,7 @@ public class ProductDataBuilder {
   private BigDecimal amount = DEFAULT_AMOUNT;
   private LocalDateTime lastAmountUpdate = DEFAULT_LAST_AMOUNT_UPDATE;
   private LocalDate creationTime = DEFAULT_CREATION_TIME;
+  private Currency currency = DEFAULT_CURRENCY;
 
   private ProductDataBuilder() {
   }
@@ -84,17 +87,22 @@ public class ProductDataBuilder {
     return this;
   }
 
+  public ProductDataBuilder withCurrency(final Currency currency) {
+    this.currency = currency;
+    return this;
+  }
+
   public ProductData build() {
     return ProductData.builder()
-            .id(id)
-            .name(name)
-            .productNumber(productNumber)
-            .info(info)
-            .category(category)
-            .price(price)
-            .amount(amount)
-            .lastAmountUpdate(lastAmountUpdate)
-            .creationTime(creationTime)
-            .build();
+        .id(id)
+        .name(name)
+        .productNumber(productNumber)
+        .info(info)
+        .category(category)
+        .price(price)
+        .amount(amount)
+        .lastAmountUpdate(lastAmountUpdate)
+        .creationTime(creationTime)
+        .build();
   }
 }
