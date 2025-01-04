@@ -2,7 +2,7 @@ package rustamscode.productstorageapi.service.dto;
 
 import lombok.Builder;
 import lombok.Value;
-import rustamscode.productstorageapi.persistance.enumeration.Category;
+import rustamscode.productstorageapi.enumeration.Category;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -14,9 +14,9 @@ import java.math.BigInteger;
 @Value
 @Builder
 public class ImmutableProductUpdateDetails {
-    BigInteger productNumber;
-    String info;
-    Category category;
-    BigDecimal price;
-    BigDecimal amount;
+  BigInteger productNumber;
+  String info;
+  Category category;
+  BigDecimal price;
+  BigDecimal amount;
 }

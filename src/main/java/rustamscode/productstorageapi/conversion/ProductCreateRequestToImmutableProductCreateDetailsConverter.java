@@ -9,17 +9,17 @@ import java.time.LocalDateTime;
 
 @Component
 public class ProductCreateRequestToImmutableProductCreateDetailsConverter implements
-        Converter<ProductCreateRequest, ImmutableProductCreateDetails> {
+    Converter<ProductCreateRequest, ImmutableProductCreateDetails> {
   @Override
   public ImmutableProductCreateDetails convert(ProductCreateRequest productCreateRequest) {
     return ImmutableProductCreateDetails.builder()
-            .name(productCreateRequest.getName())
-            .productNumber(productCreateRequest.getProductNumber())
-            .info(productCreateRequest.getInfo())
-            .category(productCreateRequest.getCategory())
-            .price(productCreateRequest.getPrice())
-            .amount(productCreateRequest.getAmount())
-            .lastAmountUpdate(LocalDateTime.now())
-            .build();
+        .name(productCreateRequest.getName())
+        .productNumber(productCreateRequest.getProductNumber())
+        .info(productCreateRequest.getInfo())
+        .category(productCreateRequest.getCategory())
+        .price(productCreateRequest.getPrice())
+        .amount(productCreateRequest.getAmount())
+        .lastAmountUpdate(LocalDateTime.now())
+        .build();
   }
 }
