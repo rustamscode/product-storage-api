@@ -49,8 +49,8 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
                                 ServerHttpRequest request, ServerHttpResponse response) {
     if (body == null) return null;
 
-    Currency currency = currencyProvider.getCurrency();
-    BigDecimal currencyRate = currencyRateProvider.getCurrencyRate(currencyProvider.getCurrency());
+    final Currency currency = currencyProvider.getCurrency();
+    final BigDecimal currencyRate = currencyRateProvider.getCurrencyRate(currency);
 
     if (body instanceof ProductDataResponse responseBody) {
       return processResponse(responseBody, currency, currencyRate);
