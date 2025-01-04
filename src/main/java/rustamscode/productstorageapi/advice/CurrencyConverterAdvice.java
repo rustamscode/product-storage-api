@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -16,11 +15,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import rustamscode.productstorageapi.currency.CurrencyProvider;
 import rustamscode.productstorageapi.currency.CurrencyRateProvider;
 import rustamscode.productstorageapi.enumeration.Currency;
+import rustamscode.productstorageapi.web.controller.ProductControllerImpl;
 import rustamscode.productstorageapi.web.dto.ProductDataResponse;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
+import java.util.Set;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -30,14 +30,15 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
   final CurrencyProvider currencyProvider;
   final CurrencyRateProvider currencyRateProvider;
 
-  Currency currency;
-  BigDecimal currencyRate;
+  final static Set<String> SUPPORTED_METHODS = Set.of("findById", "findAll", "search");
 
   @Override
   public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
     String methodName = returnType.getMethod().getName();
+    Class<?> declaringClass = returnType.getMethod().getDeclaringClass();
 
-    return methodName.contains("findById") || methodName.contains("findAll") || methodName.contains("search");
+    return SUPPORTED_METHODS.stream().anyMatch(methodName::contains)
+        && declaringClass == ProductControllerImpl.class;
   }
 
   @Override
@@ -46,19 +47,21 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
                                 MediaType selectedContentType,
                                 Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                 ServerHttpRequest request, ServerHttpResponse response) {
-    this.currency = currencyProvider.getCurrency();
-    this.currencyRate = currencyRateProvider.getCurrencyRate(currencyProvider.getCurrency());
+    if (body == null) return null;
+
+    Currency currency = currencyProvider.getCurrency();
+    BigDecimal currencyRate = currencyRateProvider.getCurrencyRate(currencyProvider.getCurrency());
 
     if (body instanceof ProductDataResponse responseBody) {
-      return processResponse(responseBody);
+      return processResponse(responseBody, currency, currencyRate);
     } else if (body instanceof Page<?> responseBody) {
-      return processResponsePage((Page<ProductDataResponse>) responseBody);
+      return processResponsePage((Page<ProductDataResponse>) responseBody, currency, currencyRate);
     }
 
     return body;
   }
 
-  private ProductDataResponse processResponse(ProductDataResponse body) {
+  private ProductDataResponse processResponse(ProductDataResponse body, Currency currency, BigDecimal currencyRate) {
     BigDecimal newPrice = body.getPrice().divide(currencyRate, RoundingMode.HALF_UP);
     body.setPrice(newPrice);
     body.setCurrency(currency);
@@ -66,13 +69,8 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
     return body;
   }
 
-  private Page<ProductDataResponse> processResponsePage(Page<ProductDataResponse> page) {
-    List<ProductDataResponse> updatedContent = page.getContent()
-        .stream()
-        .map(this::processResponse)
-        .toList();
-
-    return new PageImpl<>(updatedContent, page.getPageable(), page.getSize());
+  private Page<ProductDataResponse> processResponsePage(Page<ProductDataResponse> page, Currency currency, BigDecimal currencyRate) {
+    return page.map(response -> processResponse(response, currency, currencyRate));
   }
 }
 
