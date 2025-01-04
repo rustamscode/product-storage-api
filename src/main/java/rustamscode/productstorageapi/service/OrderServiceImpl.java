@@ -7,8 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import rustamscode.productstorageapi.enumeration.OrderStatus;
 import rustamscode.productstorageapi.exception.CustomerNotFoundException;
+import rustamscode.productstorageapi.exception.IllegalOrderAccessException;
 import rustamscode.productstorageapi.exception.InsufficientProductException;
+import rustamscode.productstorageapi.exception.OrderAccessDeniedException;
+import rustamscode.productstorageapi.exception.OrderNotFoundException;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
 import rustamscode.productstorageapi.exception.UnavailableProductException;
 import rustamscode.productstorageapi.persistance.entity.CustomerEntity;
@@ -21,9 +25,11 @@ import rustamscode.productstorageapi.persistance.repository.OrderedProductReposi
 import rustamscode.productstorageapi.persistance.repository.ProductRepository;
 import rustamscode.productstorageapi.service.dto.ImmutableOrderedProductObject;
 import rustamscode.productstorageapi.service.dto.ImmutableProductOrderDetails;
+import rustamscode.productstorageapi.service.dto.OrderData;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -49,15 +55,15 @@ public class OrderServiceImpl implements OrderService {
     Assert.notNull(customerId, "Customer ID must not be null");
     Assert.notNull(immutableProductOrderDetails, "Order details must not be null");
 
-    List<ImmutableOrderedProductObject> orderedProductObjects = immutableProductOrderDetails.getProducts();
+    final List<ImmutableOrderedProductObject> orderedProductObjects = immutableProductOrderDetails.getProducts();
 
-    CustomerEntity customer = customerRepository.findById(customerId)
+    final CustomerEntity customer = customerRepository.findById(customerId)
         .orElseThrow(() -> new CustomerNotFoundException(customerId));
 
-    List<OrderedProductEntity> orderedProducts = mapToOrderedProducts(orderedProductObjects);
-    OrderEntity order = conversionService.convert(immutableProductOrderDetails, OrderEntity.class);
+    final List<OrderedProductEntity> orderedProducts = mapToOrderedProducts(orderedProductObjects);
+    final OrderEntity order = conversionService.convert(immutableProductOrderDetails, OrderEntity.class);
     order.setCustomer(customer);
-    OrderEntity savedOrder = orderRepository.save(order);
+    final OrderEntity savedOrder = orderRepository.save(order);
     log.info("Order was saved without products");
 
     orderedProducts.forEach(product -> product.setOrder(savedOrder));
@@ -71,20 +77,128 @@ public class OrderServiceImpl implements OrderService {
     return savedOrder.getId();
   }
 
+  @Override
+  public UUID update(final UUID id,
+                     final Long customerId,
+                     final List<ImmutableOrderedProductObject> orderedProductObjects) {
+    Assert.notNull(id, "Order ID must not be null");
+    Assert.notNull(customerId, "Customer ID must not be null");
+    Assert.notNull(orderedProductObjects, "Ordered product list must not be null");
 
-  private List<OrderedProductEntity> mapToOrderedProducts(List<ImmutableOrderedProductObject> orderedProductObjects) {
+    final OrderEntity order = orderRepository.findById(id)
+        .orElseThrow(() -> new OrderNotFoundException(id));
+    customerRepository.findById(customerId)
+        .orElseThrow(() -> new CustomerNotFoundException(customerId));
+
+    if (!order.getCustomer().getId().equals(customerId)) {
+      throw new OrderAccessDeniedException(id, customerId);
+    }
+
+    if (order.getOrderStatus() != OrderStatus.CREATED) {
+      throw new IllegalOrderAccessException(order.getOrderStatus());
+    }
+
+    final List<OrderedProductEntity> orderedProducts = mapToOrderedProducts(orderedProductObjects);
+    orderedProducts.forEach(product -> product.setOrder(order));
+
+    order.getOrderedProducts().addAll(orderedProducts);
+    orderRepository.save(order);
+    log.info("Updated order was saved");
+
+    return id;
+  }
+
+  @Override
+  public OrderData findById(final UUID id, final Long customerId) {
+    Assert.notNull(id, "Order ID must not be null");
+    Assert.notNull(customerId, "Customer ID must not be null");
+
+    final OrderEntity order = orderRepository.findById(id)
+        .orElseThrow(() -> new OrderNotFoundException(id));
+    customerRepository.findById(customerId)
+        .orElseThrow(() -> new CustomerNotFoundException(customerId));
+
+    if (!order.getCustomer().getId().equals(customerId)) {
+      throw new OrderAccessDeniedException(id, customerId);
+    }
+
+    return OrderData.builder()
+        .orderId(id)
+        .orderedProducts(Optional.ofNullable(orderedProductRepository.findAllByOrderId(id)).orElseThrow())
+        .build();
+  }
+
+  @Override
+  public void delete(final UUID id, final Long customerId) {
+    Assert.notNull(id, "Order ID must not be null");
+    Assert.notNull(customerId, "Customer ID must not be null");
+
+    final OrderEntity order = orderRepository.findById(id)
+        .orElseThrow(() -> new OrderNotFoundException(id));
+    customerRepository.findById(customerId)
+        .orElseThrow(() -> new CustomerNotFoundException(customerId));
+
+    if (!order.getCustomer().getId().equals(customerId)) {
+      throw new OrderAccessDeniedException(id, customerId);
+    }
+
+    if (order.getOrderStatus() != OrderStatus.CREATED) {
+      throw new IllegalOrderAccessException(order.getOrderStatus());
+    }
+
+    order.setOrderStatus(OrderStatus.CANCELLED);
+
+    final List<OrderedProductEntity> orderedProducts = order.getOrderedProducts();
+    orderedProducts.forEach(orderedProduct -> {
+      final ProductEntity product = orderedProduct.getProduct();
+      final BigDecimal newAmount = product.getAmount().add(orderedProduct.getOrderedProductAmount());
+      product.setAmount(newAmount);
+      productRepository.save(product);
+    });
+
+    log.info("The order was deleted");
+  }
+
+  @Override
+  public void confirm(final UUID id, final Long customerId) {
+    //TODO Implementation
+  }
+
+  @Override
+  public UUID updateStatus(final UUID id, final Long customerId, final OrderStatus status) {
+    Assert.notNull(id, "Order ID must not be null");
+    Assert.notNull(customerId, "Customer ID must not be null");
+    Assert.notNull(status, "Order status must not bu null");
+
+    final OrderEntity order = orderRepository.findById(id)
+        .orElseThrow(() -> new OrderNotFoundException(id));
+    customerRepository.findById(customerId)
+        .orElseThrow(() -> new CustomerNotFoundException(customerId));
+
+    if (!order.getCustomer().getId().equals(customerId)) {
+      throw new OrderAccessDeniedException(id, customerId);
+    }
+
+    order.setOrderStatus(status);
+    orderRepository.save(order);
+    log.info("Order status was updated");
+
+    return order.getId();
+  }
+
+  private List<OrderedProductEntity> mapToOrderedProducts(final List<ImmutableOrderedProductObject> orderedProductObjects) {
     return orderedProductObjects.stream()
         .map(orderedProductObject -> {
           UUID productId = orderedProductObject.getId();
 
-          ProductEntity product = productRepository.findById(productId)
+          final ProductEntity product = productRepository.findById(productId)
               .orElseThrow(() -> new ProductNotFoundException(productId));
 
           if (!product.getIsAvailable()) {
             throw new UnavailableProductException(productId);
           }
 
-          BigDecimal amountAfterOrder = product.getAmount().subtract(orderedProductObject.getAmount());
+          final BigDecimal amountAfterOrder = product.getAmount().subtract(orderedProductObject.getAmount());
           if (amountAfterOrder.compareTo(BigDecimal.ZERO) < 0) {
             throw new InsufficientProductException(productId);
           }

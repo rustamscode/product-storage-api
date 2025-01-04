@@ -16,10 +16,9 @@ import java.util.UUID;
 public class OrderedProductRequest {
 
   @NotNull
-  @Min(value = 0, message = "Product id must be 0 or greater!")
   UUID id;
 
   @NotNull
-  @Min(value = 0, message = "Amount must be 0 or greater!")
+  @Min(value = 1, message = "Amount must be 1 or greater!")
   BigDecimal amount;
 }
