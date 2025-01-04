@@ -9,14 +9,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 public class WebClientConfig {
 
-  final private RestProperties restProperties;
+    final private RestProperties restProperties;
 
-  @Bean
-  public WebClient webClient() {
-    final String baseUrl = restProperties.getCurrencyServiceClient().getHost();
+    @Bean
+    public WebClient webClient() {
+        final String baseUrl = restProperties.getCurrencyServiceClient().getHost();
 
-    return WebClient.builder()
-        .baseUrl(baseUrl)
-        .build();
-  }
+        return WebClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+    }
 }

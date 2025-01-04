@@ -15,23 +15,23 @@ import rustamscode.productstorageapi.search.strategy.PredicateStrategy;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategorySearchCriteria implements SearchCriteria<Category> {
 
-  final static PredicateStrategy STRATEGY = new CategoryPredicateStrategy();
+    final static PredicateStrategy STRATEGY = new CategoryPredicateStrategy();
 
-  final String field;
+    final String field;
 
-  @NotNull(message = "The value must not be null!")
-  final Category value;
+    @NotNull(message = "The value must not be null!")
+    final Category value;
 
-  final String operationType;
+    final String operationType;
 
-  @Override
-  public PredicateStrategy getStrategy() {
-    return STRATEGY;
-  }
+    @Override
+    public PredicateStrategy getStrategy() {
+        return STRATEGY;
+    }
 
-  @Override
-  public OperationType getOperationType() {
-    return OperationType.fromOperation(operationType);
-  }
+    @Override
+    public OperationType getOperationType() {
+        return OperationType.fromOperation(operationType);
+    }
 }
 

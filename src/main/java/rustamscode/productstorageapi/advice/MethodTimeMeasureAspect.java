@@ -14,13 +14,13 @@ import java.time.Instant;
 @Component
 public class MethodTimeMeasureAspect {
 
-  @Around(value = "@annotation(rustamscode.productstorageapi.advice.annotation.MeasureTime)")
-  public Object measureMethodTime(ProceedingJoinPoint joinPoint) throws Throwable {
-    final Instant start = Instant.now();
-    Object returnValue = joinPoint.proceed();
-    final Instant finish = Instant.now();
+    @Around(value = "@annotation(rustamscode.productstorageapi.advice.annotation.MeasureTime)")
+    public Object measureMethodTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        final Instant start = Instant.now();
+        Object returnValue = joinPoint.proceed();
+        final Instant finish = Instant.now();
 
-    log.info("Method execution took {} ms", Duration.between(start, finish).toMillis());
-    return returnValue;
-  }
+        log.info("Method execution took {} ms", Duration.between(start, finish).toMillis());
+        return returnValue;
+    }
 }

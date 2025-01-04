@@ -14,16 +14,16 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ProductService {
-  UUID create(@Valid final ImmutableProductCreateDetails request);
+    UUID create(@Valid final ImmutableProductCreateDetails request);
 
-  ProductData findById(final Currency currency, final UUID id);
+    ProductData findById(final Currency currency, final UUID id);
 
-  Page<ProductData> findAll(final Currency currency, final Pageable pageable);
+    Page<ProductData> findAll(final Currency currency, final Pageable pageable);
 
-  @Transactional
-  UUID update(final UUID id, final ImmutableProductUpdateDetails request);
+    @Transactional
+    UUID update(final UUID id, final ImmutableProductUpdateDetails request);
 
-  void delete(final UUID id);
+    void delete(final UUID id);
 
-  Page<ProductData> search(final Currency currency, Pageable pageable, List<SearchCriteria> criteriaList);
+    Page<ProductData> search(final Currency currency, Pageable pageable, List<SearchCriteria> criteriaList);
 }

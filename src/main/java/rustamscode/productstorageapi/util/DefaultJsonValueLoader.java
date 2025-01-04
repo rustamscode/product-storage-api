@@ -18,24 +18,24 @@ import java.io.IOException;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DefaultJsonValueLoader {
 
-  final ObjectMapper objectMapper;
+    final ObjectMapper objectMapper;
 
-  final RestProperties restProperties;
+    final RestProperties restProperties;
 
-  public CurrencyRateDetails getCurrencyRateDetails() {
-    final String defaultCurrencyRates = restProperties.getCurrencyServiceClient()
-        .getFiles()
-        .getDefaultCurrencyRates();
+    public CurrencyRateDetails getCurrencyRateDetails() {
+        final String defaultCurrencyRates = restProperties.getCurrencyServiceClient()
+                .getFiles()
+                .getDefaultCurrencyRates();
 
-    try {
-      return objectMapper.readValue(
-          new File(defaultCurrencyRates),
-          CurrencyRateDetails.class
-      );
-    } catch (IOException e) {
-      log.error("Error reading default value from file: {}", e.getMessage());
-      throw new RuntimeException(e);
+        try {
+            return objectMapper.readValue(
+                    new File(defaultCurrencyRates),
+                    CurrencyRateDetails.class
+            );
+        } catch (IOException e) {
+            log.error("Error reading default value from file: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
-  }
 }
 

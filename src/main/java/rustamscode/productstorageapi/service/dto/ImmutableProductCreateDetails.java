@@ -17,13 +17,13 @@ import java.time.LocalDateTime;
 @Value
 @Builder
 public class ImmutableProductCreateDetails {
-  String name;
-  BigInteger productNumber;
-  String info;
-  Category category;
-  BigDecimal price;
-  BigDecimal amount;
+    String name;
+    BigInteger productNumber;
+    String info;
+    Category category;
+    BigDecimal price;
+    BigDecimal amount;
 
-  @PastOrPresent
-  LocalDateTime lastAmountUpdate;
+    @PastOrPresent
+    LocalDateTime lastAmountUpdate;
 }

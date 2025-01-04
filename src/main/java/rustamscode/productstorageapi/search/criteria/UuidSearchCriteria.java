@@ -16,22 +16,22 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UuidSearchCriteria implements SearchCriteria<UUID> {
 
-  final static PredicateStrategy STRATEGY = new UuidPredicateStrategy();
+    final static PredicateStrategy STRATEGY = new UuidPredicateStrategy();
 
-  final String field;
+    final String field;
 
-  @NotNull(message = "The value must not be null!")
-  final UUID value;
+    @NotNull(message = "The value must not be null!")
+    final UUID value;
 
-  final String operationType;
+    final String operationType;
 
-  @Override
-  public PredicateStrategy getStrategy() {
-    return STRATEGY;
-  }
+    @Override
+    public PredicateStrategy getStrategy() {
+        return STRATEGY;
+    }
 
-  @Override
-  public OperationType getOperationType() {
-    return OperationType.fromOperation(operationType);
-  }
+    @Override
+    public OperationType getOperationType() {
+        return OperationType.fromOperation(operationType);
+    }
 }

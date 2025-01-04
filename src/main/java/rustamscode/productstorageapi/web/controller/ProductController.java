@@ -30,34 +30,34 @@ import java.util.UUID;
 @Validated
 public interface ProductController {
 
-  @PostMapping
-  @Operation(summary = "Create a product")
-  @ResponseStatus(HttpStatus.CREATED)
-  UUID create(@Valid @NotNull @RequestBody final ProductCreateRequest productCreateRequest);
+    @PostMapping
+    @Operation(summary = "Create a product")
+    @ResponseStatus(HttpStatus.CREATED)
+    UUID create(@Valid @NotNull @RequestBody final ProductCreateRequest productCreateRequest);
 
-  @Operation(summary = "Find a product by ID")
-  @GetMapping("/{id}")
-  ProductDataResponse findById(@RequestHeader final Currency currency,
-                               @PathVariable final UUID id);
+    @Operation(summary = "Find a product by ID")
+    @GetMapping("/{id}")
+    ProductDataResponse findById(@RequestHeader final Currency currency,
+                                 @PathVariable final UUID id);
 
-  @Operation(summary = "Find all products")
-  @GetMapping
-  Page<ProductDataResponse> findAll(@RequestHeader final Currency currency,
-                                    @PageableDefault(sort = "name") final Pageable pageable);
+    @Operation(summary = "Find all products")
+    @GetMapping
+    Page<ProductDataResponse> findAll(@RequestHeader final Currency currency,
+                                      @PageableDefault(sort = "name") final Pageable pageable);
 
-  @Operation(summary = "Update a product")
-  @PutMapping("/{id}")
-  UUID update(@PathVariable final UUID id,
-              @Valid @NotNull @RequestBody final ProductUpdateRequest productUpdateRequest);
+    @Operation(summary = "Update a product")
+    @PutMapping("/{id}")
+    UUID update(@PathVariable final UUID id,
+                @Valid @NotNull @RequestBody final ProductUpdateRequest productUpdateRequest);
 
-  @DeleteMapping("/{id}")
-  @Operation(summary = "Delete a product")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  void delete(@PathVariable final UUID id);
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a product")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void delete(@PathVariable final UUID id);
 
-  @GetMapping("/search")
-  @Operation(summary = "Search for product")
-  Page<ProductDataResponse> search(@RequestHeader final Currency currency,
-                                   @PageableDefault(sort = "name") final Pageable pageable,
-                                   @Valid @RequestBody final List<SearchCriteria> criteriaList);
+    @GetMapping("/search")
+    @Operation(summary = "Search for product")
+    Page<ProductDataResponse> search(@RequestHeader final Currency currency,
+                                     @PageableDefault(sort = "name") final Pageable pageable,
+                                     @Valid @RequestBody final List<SearchCriteria> criteriaList);
 }

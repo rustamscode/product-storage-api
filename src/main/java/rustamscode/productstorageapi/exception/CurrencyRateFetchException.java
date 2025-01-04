@@ -1,7 +1,7 @@
 package rustamscode.productstorageapi.exception;
 
 public class CurrencyRateFetchException extends RuntimeException {
-  public CurrencyRateFetchException(String message) {
-    super(message);
-  }
+    public CurrencyRateFetchException(String message) {
+        super(message);
+    }
 }

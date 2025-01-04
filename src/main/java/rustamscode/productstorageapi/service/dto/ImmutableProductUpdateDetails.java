@@ -14,9 +14,9 @@ import java.math.BigInteger;
 @Value
 @Builder
 public class ImmutableProductUpdateDetails {
-  BigInteger productNumber;
-  String info;
-  Category category;
-  BigDecimal price;
-  BigDecimal amount;
+    BigInteger productNumber;
+    String info;
+    Category category;
+    BigDecimal price;
+    BigDecimal amount;
 }

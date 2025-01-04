@@ -33,40 +33,40 @@ import java.util.UUID;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductEntity {
-  @Id
-  @GeneratedValue
-  @UuidGenerator(style = UuidGenerator.Style.TIME)
-  @Column(name = "id", nullable = false)
-  UUID id;
+    @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    @Column(name = "id", nullable = false)
+    UUID id;
 
-  @Column(name = "name", nullable = false)
-  String name;
+    @Column(name = "name", nullable = false)
+    String name;
 
-  @Column(name = "product_number", unique = true, nullable = false)
-  BigInteger productNumber;
+    @Column(name = "product_number", unique = true, nullable = false)
+    BigInteger productNumber;
 
-  @Column(name = "info")
-  String info;
+    @Column(name = "info")
+    String info;
 
-  @Column(name = "category")
-  @Enumerated(EnumType.STRING)
-  Category category;
+    @Column(name = "category")
+    @Enumerated(EnumType.STRING)
+    Category category;
 
-  @Column(name = "price")
-  BigDecimal price;
+    @Column(name = "price")
+    BigDecimal price;
 
-  @Column(name = "amount")
-  BigDecimal amount;
+    @Column(name = "amount")
+    BigDecimal amount;
 
-  @CreationTimestamp
-  @Column(name = "last_amount_update")
-  LocalDateTime lastAmountUpdate;
+    @CreationTimestamp
+    @Column(name = "last_amount_update")
+    LocalDateTime lastAmountUpdate;
 
-  @CreationTimestamp
-  @Column(name = "creation_time", updatable = false)
-  LocalDateTime creationTime;
+    @CreationTimestamp
+    @Column(name = "creation_time", updatable = false)
+    LocalDateTime creationTime;
 
-  @Version
-  @Column(name = "version")
-  Integer version;
+    @Version
+    @Column(name = "version")
+    Integer version;
 }

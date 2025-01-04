@@ -14,6 +14,6 @@ import rustamscode.productstorageapi.enumeration.Currency;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CurrencyProvider {
 
-  @Value("${currency.default:RUB}")
-  Currency currency;
+    @Value("${currency.default:RUB}")
+    Currency currency;
 }

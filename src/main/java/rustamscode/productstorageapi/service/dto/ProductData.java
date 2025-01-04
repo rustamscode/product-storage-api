@@ -20,14 +20,14 @@ import java.util.UUID;
 @Value
 @Builder
 public class ProductData {
-  UUID id;
-  String name;
-  BigInteger productNumber;
-  String info;
-  Category category;
-  BigDecimal price;
-  BigDecimal amount;
-  LocalDateTime lastAmountUpdate;
-  LocalDate creationTime;
-  Currency currency;
+    UUID id;
+    String name;
+    BigInteger productNumber;
+    String info;
+    Category category;
+    BigDecimal price;
+    BigDecimal amount;
+    LocalDateTime lastAmountUpdate;
+    LocalDate creationTime;
+    Currency currency;
 }

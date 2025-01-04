@@ -19,16 +19,16 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class CurrencySetterFilter extends OncePerRequestFilter {
-  final CurrencyProvider currencyProvider;
+    final CurrencyProvider currencyProvider;
 
-  @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-      throws ServletException, IOException {
-    final String currency = request.getHeader("currency");
-    Optional.ofNullable(currency)
-        .map(Currency::valueOf)
-        .ifPresent(currencyProvider::setCurrency);
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        final String currency = request.getHeader("currency");
+        Optional.ofNullable(currency)
+                .map(Currency::valueOf)
+                .ifPresent(currencyProvider::setCurrency);
 
-    filterChain.doFilter(request, response);
-  }
+        filterChain.doFilter(request, response);
+    }
 }

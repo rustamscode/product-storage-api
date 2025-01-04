@@ -13,14 +13,14 @@ import java.util.UUID;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, UUID>, JpaSpecificationExecutor<ProductEntity> {
-  boolean existsByProductNumber(BigInteger productNumber);
+    boolean existsByProductNumber(BigInteger productNumber);
 
-  Optional<ProductEntity> findByProductNumber(BigInteger productNumber);
+    Optional<ProductEntity> findByProductNumber(BigInteger productNumber);
 
-  @Query(value = """
-      SELECT * FROM products
-      WHERE id = :id
-      FOR UPDATE;
-      """, nativeQuery = true)
-  Optional<ProductEntity> findByIdLocked(@Param("id") UUID id);
+    @Query(value = """
+            SELECT * FROM products
+            WHERE id = :id
+            FOR UPDATE;
+            """, nativeQuery = true)
+    Optional<ProductEntity> findByIdLocked(@Param("id") UUID id);
 }

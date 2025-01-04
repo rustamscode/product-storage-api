@@ -26,14 +26,14 @@ import java.util.UUID;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDataResponse {
-  UUID id;
-  String name;
-  BigInteger productNumber;
-  String info;
-  Category category;
-  BigDecimal price;
-  BigDecimal amount;
-  LocalDateTime lastAmountUpdate;
-  LocalDate creationTime;
-  Currency currency;
+    UUID id;
+    String name;
+    BigInteger productNumber;
+    String info;
+    Category category;
+    BigDecimal price;
+    BigDecimal amount;
+    LocalDateTime lastAmountUpdate;
+    LocalDate creationTime;
+    Currency currency;
 }

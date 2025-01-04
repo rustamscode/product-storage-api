@@ -13,8 +13,8 @@ import rustamscode.productstorageapi.config.RestProperties;
 @EnableConfigurationProperties(RestProperties.class)
 public class ProductStorageApiApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(ProductStorageApiApplication.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(ProductStorageApiApplication.class, args);
+    }
 
 }

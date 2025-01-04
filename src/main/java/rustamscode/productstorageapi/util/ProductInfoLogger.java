@@ -17,36 +17,36 @@ import java.sql.SQLException;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductInfoLogger {
 
-  final String PRICE_UPDATE_LOGFILE = "price_update_log";
+    final String PRICE_UPDATE_LOGFILE = "price_update_log";
 
-  public void logProductPriceUpdateInfo(ResultSet resultSet) {
-    try (BufferedWriter writer = Files.newBufferedWriter(Path.of(PRICE_UPDATE_LOGFILE))) {
-      while (resultSet.next()) {
-        writer.write(buildString(resultSet));
-        writer.newLine();
-      }
+    public void logProductPriceUpdateInfo(ResultSet resultSet) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Path.of(PRICE_UPDATE_LOGFILE))) {
+            while (resultSet.next()) {
+                writer.write(buildString(resultSet));
+                writer.newLine();
+            }
 
-    } catch (IOException | SQLException e) {
-      log.error(
-          "There was a problem logging product price update info: {}",
-          e.getMessage()
-      );
-      throw new RuntimeException(e);
+        } catch (IOException | SQLException e) {
+            log.error(
+                    "There was a problem logging product price update info: {}",
+                    e.getMessage()
+            );
+            throw new RuntimeException(e);
+        }
     }
-  }
 
-  private String buildString(final ResultSet resultSet) throws SQLException {
-    return String.join(" ",
-        resultSet.getString("id"),
-        resultSet.getString("name"),
-        resultSet.getString("product_number"),
-        resultSet.getString("info"),
-        resultSet.getString("category"),
-        resultSet.getString("price"),
-        resultSet.getString("amount"),
-        resultSet.getString("last_amount_update"),
-        resultSet.getString("creation_time"),
-        resultSet.getString("version"));
-  }
+    private String buildString(final ResultSet resultSet) throws SQLException {
+        return String.join(" ",
+                resultSet.getString("id"),
+                resultSet.getString("name"),
+                resultSet.getString("product_number"),
+                resultSet.getString("info"),
+                resultSet.getString("category"),
+                resultSet.getString("price"),
+                resultSet.getString("amount"),
+                resultSet.getString("last_amount_update"),
+                resultSet.getString("creation_time"),
+                resultSet.getString("version"));
+    }
 }
 

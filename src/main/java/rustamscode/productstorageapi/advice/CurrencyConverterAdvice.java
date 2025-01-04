@@ -27,50 +27,50 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
 
-  final CurrencyProvider currencyProvider;
-  final CurrencyRateProvider currencyRateProvider;
+    final CurrencyProvider currencyProvider;
+    final CurrencyRateProvider currencyRateProvider;
 
-  final static Set<String> SUPPORTED_METHODS = Set.of("findById", "findAll", "search");
+    final static Set<String> SUPPORTED_METHODS = Set.of("findById", "findAll", "search");
 
-  @Override
-  public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-    String methodName = returnType.getMethod().getName();
-    Class<?> declaringClass = returnType.getMethod().getDeclaringClass();
+    @Override
+    public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+        String methodName = returnType.getMethod().getName();
+        Class<?> declaringClass = returnType.getMethod().getDeclaringClass();
 
-    return SUPPORTED_METHODS.stream().anyMatch(methodName::contains)
-        && declaringClass == ProductControllerImpl.class;
-  }
-
-  @Override
-  public Object beforeBodyWrite(@Nullable Object body,
-                                MethodParameter returnType,
-                                MediaType selectedContentType,
-                                Class<? extends HttpMessageConverter<?>> selectedConverterType,
-                                ServerHttpRequest request, ServerHttpResponse response) {
-    if (body == null) return null;
-
-    Currency currency = currencyProvider.getCurrency();
-    BigDecimal currencyRate = currencyRateProvider.getCurrencyRate(currencyProvider.getCurrency());
-
-    if (body instanceof ProductDataResponse responseBody) {
-      return processResponse(responseBody, currency, currencyRate);
-    } else if (body instanceof Page<?> responseBody) {
-      return processResponsePage((Page<ProductDataResponse>) responseBody, currency, currencyRate);
+        return SUPPORTED_METHODS.stream().anyMatch(methodName::contains)
+                && declaringClass == ProductControllerImpl.class;
     }
 
-    return body;
-  }
+    @Override
+    public Object beforeBodyWrite(@Nullable Object body,
+                                  MethodParameter returnType,
+                                  MediaType selectedContentType,
+                                  Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                                  ServerHttpRequest request, ServerHttpResponse response) {
+        if (body == null) return null;
 
-  private ProductDataResponse processResponse(ProductDataResponse body, Currency currency, BigDecimal currencyRate) {
-    BigDecimal newPrice = body.getPrice().divide(currencyRate, RoundingMode.HALF_UP);
-    body.setPrice(newPrice);
-    body.setCurrency(currency);
+        Currency currency = currencyProvider.getCurrency();
+        BigDecimal currencyRate = currencyRateProvider.getCurrencyRate(currencyProvider.getCurrency());
 
-    return body;
-  }
+        if (body instanceof ProductDataResponse responseBody) {
+            return processResponse(responseBody, currency, currencyRate);
+        } else if (body instanceof Page<?> responseBody) {
+            return processResponsePage((Page<ProductDataResponse>) responseBody, currency, currencyRate);
+        }
 
-  private Page<ProductDataResponse> processResponsePage(Page<ProductDataResponse> page, Currency currency, BigDecimal currencyRate) {
-    return page.map(response -> processResponse(response, currency, currencyRate));
-  }
+        return body;
+    }
+
+    private ProductDataResponse processResponse(ProductDataResponse body, Currency currency, BigDecimal currencyRate) {
+        BigDecimal newPrice = body.getPrice().divide(currencyRate, RoundingMode.HALF_UP);
+        body.setPrice(newPrice);
+        body.setCurrency(currency);
+
+        return body;
+    }
+
+    private Page<ProductDataResponse> processResponsePage(Page<ProductDataResponse> page, Currency currency, BigDecimal currencyRate) {
+        return page.map(response -> processResponse(response, currency, currencyRate));
+    }
 }
 

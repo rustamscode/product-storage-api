@@ -28,42 +28,42 @@ import java.sql.Statement;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OptimizedProductPriceScheduler implements ProductPriceScheduler {
 
-  final DataSource dataSource;
+    final DataSource dataSource;
 
-  final static String UPDATE_QUERY = """
-      UPDATE products SET price = price + (price * (? / 100)) 
-      RETURNING *;
-      """;
-  final static String LOCK_QUERY = "LOCK TABLE products IN EXCLUSIVE MODE;";
+    final static String UPDATE_QUERY = """
+            UPDATE products SET price = price + (price * (? / 100)) 
+            RETURNING *;
+            """;
+    final static String LOCK_QUERY = "LOCK TABLE products IN EXCLUSIVE MODE;";
 
-  @Value("${spring.scheduling.priceIncreasePercentage}")
-  BigDecimal increasePercentage;
+    @Value("${spring.scheduling.priceIncreasePercentage}")
+    BigDecimal increasePercentage;
 
-  @MeasureTime
-  @Scheduled(fixedRateString = "${spring.scheduling.period}")
-  public void increasePrice() throws SQLException {
-    log.info("Optimized scheduler started");
+    @MeasureTime
+    @Scheduled(fixedRateString = "${spring.scheduling.period}")
+    public void increasePrice() throws SQLException {
+        log.info("Optimized scheduler started");
 
-    Connection connection = dataSource.getConnection();
-    connection.setAutoCommit(false);
+        Connection connection = dataSource.getConnection();
+        connection.setAutoCommit(false);
 
-    try (connection) {
-      final PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_QUERY);
-      preparedStatement.setBigDecimal(1, increasePercentage);
-      preparedStatement.setFetchSize(1000);
-      final Statement statement = connection.createStatement();
+        try (connection) {
+            final PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_QUERY);
+            preparedStatement.setBigDecimal(1, increasePercentage);
+            preparedStatement.setFetchSize(1000);
+            final Statement statement = connection.createStatement();
 
-      statement.execute(LOCK_QUERY);
-      final ResultSet resultSet = preparedStatement.executeQuery();
-      ProductInfoLogger.logProductPriceUpdateInfo(resultSet);
+            statement.execute(LOCK_QUERY);
+            final ResultSet resultSet = preparedStatement.executeQuery();
+            ProductInfoLogger.logProductPriceUpdateInfo(resultSet);
 
-      connection.commit();
-    } catch (Exception e) {
-      connection.rollback();
-      throw new RuntimeException(e);
+            connection.commit();
+        } catch (Exception e) {
+            connection.rollback();
+            throw new RuntimeException(e);
+        }
+
+        log.info("Optimized scheduler finished");
     }
-
-    log.info("Optimized scheduler finished");
-  }
 }
 

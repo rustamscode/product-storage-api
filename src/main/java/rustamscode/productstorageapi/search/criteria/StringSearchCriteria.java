@@ -14,22 +14,22 @@ import rustamscode.productstorageapi.search.strategy.StringPredicateStrategy;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StringSearchCriteria implements SearchCriteria<String> {
 
-  final static PredicateStrategy STRATEGY = new StringPredicateStrategy();
+    final static PredicateStrategy STRATEGY = new StringPredicateStrategy();
 
-  final String field;
+    final String field;
 
-  @NotBlank(message = "The value must not be null or blank!")
-  final String value;
+    @NotBlank(message = "The value must not be null or blank!")
+    final String value;
 
-  final String operationType;
+    final String operationType;
 
-  @Override
-  public PredicateStrategy getStrategy() {
-    return STRATEGY;
-  }
+    @Override
+    public PredicateStrategy getStrategy() {
+        return STRATEGY;
+    }
 
-  @Override
-  public OperationType getOperationType() {
-    return OperationType.fromOperation(operationType);
-  }
+    @Override
+    public OperationType getOperationType() {
+        return OperationType.fromOperation(operationType);
+    }
 }

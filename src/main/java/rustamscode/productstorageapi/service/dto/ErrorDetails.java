@@ -11,7 +11,7 @@ import lombok.Value;
 @Value
 @Builder
 public class ErrorDetails {
-  String message;
-  String exception;
-  String source;
+    String message;
+    String exception;
+    String source;
 }

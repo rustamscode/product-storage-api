@@ -15,27 +15,27 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class CacheConfig {
 
-  private final RestProperties restProperties;
+    private final RestProperties restProperties;
 
-  @Bean
-  public Caffeine<Object, Object> caffeineConfig() {
-    final Integer expirationTime = restProperties.getCurrencyServiceClient()
-        .getCache()
-        .getExpirationTime();
-    final Integer initialCapacity = restProperties.getCurrencyServiceClient()
-        .getCache()
-        .getInitialCapacity();
+    @Bean
+    public Caffeine<Object, Object> caffeineConfig() {
+        final Integer expirationTime = restProperties.getCurrencyServiceClient()
+                .getCache()
+                .getExpirationTime();
+        final Integer initialCapacity = restProperties.getCurrencyServiceClient()
+                .getCache()
+                .getInitialCapacity();
 
-    return Caffeine.newBuilder()
-        .initialCapacity(initialCapacity)
-        .expireAfterAccess(expirationTime, TimeUnit.SECONDS);
-  }
+        return Caffeine.newBuilder()
+                .initialCapacity(initialCapacity)
+                .expireAfterAccess(expirationTime, TimeUnit.SECONDS);
+    }
 
-  @Bean
-  public CacheManager cacheManager(Caffeine caffeine) {
-    final CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
-    caffeineCacheManager.setCaffeine(caffeine);
+    @Bean
+    public CacheManager cacheManager(Caffeine caffeine) {
+        final CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
+        caffeineCacheManager.setCaffeine(caffeine);
 
-    return caffeineCacheManager;
-  }
+        return caffeineCacheManager;
+    }
 }

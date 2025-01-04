@@ -9,12 +9,12 @@ import java.math.BigDecimal;
 @Profile("test")
 @Service
 public class CurrencyServiceClientMock implements CurrencyServiceClient {
-  @Override
-  public CurrencyRateDetails getCurrencyRateDetails() {
-    return CurrencyRateDetails.builder()
-        .RUB(BigDecimal.TWO)
-        .USD(BigDecimal.TEN)
-        .CNY(BigDecimal.ONE)
-        .build();
-  }
+    @Override
+    public CurrencyRateDetails getCurrencyRateDetails() {
+        return CurrencyRateDetails.builder()
+                .RUB(BigDecimal.TWO)
+                .USD(BigDecimal.TEN)
+                .CNY(BigDecimal.ONE)
+                .build();
+    }
 }

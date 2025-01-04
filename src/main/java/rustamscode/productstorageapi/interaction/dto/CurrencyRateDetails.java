@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 @Data
 @Builder
 public class CurrencyRateDetails {
-  private BigDecimal RUB;
+    private BigDecimal RUB;
 
-  private BigDecimal USD;
+    private BigDecimal USD;
 
-  private BigDecimal CNY;
+    private BigDecimal CNY;
 }

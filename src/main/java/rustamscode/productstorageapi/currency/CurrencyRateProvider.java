@@ -19,24 +19,24 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CurrencyRateProvider {
 
-  final CurrencyServiceClient currencyServiceClient;
-  final DefaultJsonValueLoader defaultValueLoader;
+    final CurrencyServiceClient currencyServiceClient;
+    final DefaultJsonValueLoader defaultValueLoader;
 
-  public BigDecimal getCurrencyRate(Currency currency) {
-    final CurrencyRateDetails currencyRates = fetchCurrencyRateDetails();
+    public BigDecimal getCurrencyRate(Currency currency) {
+        final CurrencyRateDetails currencyRates = fetchCurrencyRateDetails();
 
-    return switch (currency) {
-      case RUB -> currencyRates.getRUB();
-      case USD -> currencyRates.getUSD();
-      case CNY -> currencyRates.getCNY();
-    };
-  }
+        return switch (currency) {
+            case RUB -> currencyRates.getRUB();
+            case USD -> currencyRates.getUSD();
+            case CNY -> currencyRates.getCNY();
+        };
+    }
 
-  private CurrencyRateDetails fetchCurrencyRateDetails() {
-    final Optional<CurrencyRateDetails> currencyRates = Optional.ofNullable(
-        currencyServiceClient.getCurrencyRateDetails()
-    );
+    private CurrencyRateDetails fetchCurrencyRateDetails() {
+        final Optional<CurrencyRateDetails> currencyRates = Optional.ofNullable(
+                currencyServiceClient.getCurrencyRateDetails()
+        );
 
-    return currencyRates.orElse(defaultValueLoader.getCurrencyRateDetails());
-  }
+        return currencyRates.orElse(defaultValueLoader.getCurrencyRateDetails());
+    }
 }

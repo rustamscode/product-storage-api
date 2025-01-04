@@ -36,101 +36,101 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE) //TODO Хорошо ли здесь использовать @Value?
 public class ProductControllerImpl implements ProductController {
-  /**
-   * Service layer for product-management business logic
-   */
-  final ProductService productService;
+    /**
+     * Service layer for product-management business logic
+     */
+    final ProductService productService;
 
-  /**
-   * Conversion service for data transfer object conversions
-   */
-  final ConversionService conversionService;
+    /**
+     * Conversion service for data transfer object conversions
+     */
+    final ConversionService conversionService;
 
-  /**
-   * Creates a new product based on the provided request.
-   *
-   * @param productCreateRequest the request containing the details to create the product
-   * @return the unique identifier of the created product
-   * @throws IllegalArgumentException if the provided request is null
-   * @throws ValidationException      if the provided request is not valid
-   */
-  @Override
-  public UUID create(final ProductCreateRequest productCreateRequest) {
-    return productService
-        .create(conversionService.convert(productCreateRequest, ImmutableProductCreateDetails.class));
-  }
+    /**
+     * Creates a new product based on the provided request.
+     *
+     * @param productCreateRequest the request containing the details to create the product
+     * @return the unique identifier of the created product
+     * @throws IllegalArgumentException if the provided request is null
+     * @throws ValidationException      if the provided request is not valid
+     */
+    @Override
+    public UUID create(final ProductCreateRequest productCreateRequest) {
+        return productService
+                .create(conversionService.convert(productCreateRequest, ImmutableProductCreateDetails.class));
+    }
 
-  /**
-   * Gets a product by its unique identifier.
-   *
-   * @param currency displayed currency
-   * @param id       the ID of the product get
-   * @return the {@link ProductDataResponse} representation of the product
-   * @throws IllegalArgumentException if the provided id is null
-   * @throws ProductNotFoundException if no product is found with the given id
-   */
-  @Override
-  public ProductDataResponse findById(final Currency currency, final UUID id) {
-    return conversionService.convert(productService.findById(currency, id), ProductDataResponse.class);
-  }
+    /**
+     * Gets a product by its unique identifier.
+     *
+     * @param currency displayed currency
+     * @param id       the ID of the product get
+     * @return the {@link ProductDataResponse} representation of the product
+     * @throws IllegalArgumentException if the provided id is null
+     * @throws ProductNotFoundException if no product is found with the given id
+     */
+    @Override
+    public ProductDataResponse findById(final Currency currency, final UUID id) {
+        return conversionService.convert(productService.findById(currency, id), ProductDataResponse.class);
+    }
 
-  /**
-   * Gets a paginated list of all products.
-   *
-   * @param currency displayed currency
-   * @param pageable the pagination information with default settings (page = 0, size = 10, sort = "name")
-   * @return a {@link Page} of {@link ProductDataResponse} representing the products
-   */
-  @Override
-  public Page<ProductDataResponse> findAll(final Currency currency, final Pageable pageable) {
-    return productService
-        .findAll(currency, pageable)
-        .map(productData -> conversionService.convert(productData, ProductDataResponse.class));
-  }
+    /**
+     * Gets a paginated list of all products.
+     *
+     * @param currency displayed currency
+     * @param pageable the pagination information with default settings (page = 0, size = 10, sort = "name")
+     * @return a {@link Page} of {@link ProductDataResponse} representing the products
+     */
+    @Override
+    public Page<ProductDataResponse> findAll(final Currency currency, final Pageable pageable) {
+        return productService
+                .findAll(currency, pageable)
+                .map(productData -> conversionService.convert(productData, ProductDataResponse.class));
+    }
 
-  /**
-   * Updates an existing product with the provided details.
-   *
-   * @param id                   the ID of the product to be updated
-   * @param productUpdateRequest the request containing the details to update the product
-   * @return the ID of the updated product
-   * @throws IllegalArgumentException        if the provided id or request is null
-   * @throws ValidationException             if the provided request is not valid
-   * @throws ProductNotFoundException        if no product is found with the given id
-   * @throws NonUniqueProductNumberException if the new product number is not unique
-   */
-  @Override
-  public UUID update(final UUID id, final ProductUpdateRequest productUpdateRequest) {
-    return productService
-        .update(id, conversionService.convert(productUpdateRequest, ImmutableProductUpdateDetails.class));
-  }
+    /**
+     * Updates an existing product with the provided details.
+     *
+     * @param id                   the ID of the product to be updated
+     * @param productUpdateRequest the request containing the details to update the product
+     * @return the ID of the updated product
+     * @throws IllegalArgumentException        if the provided id or request is null
+     * @throws ValidationException             if the provided request is not valid
+     * @throws ProductNotFoundException        if no product is found with the given id
+     * @throws NonUniqueProductNumberException if the new product number is not unique
+     */
+    @Override
+    public UUID update(final UUID id, final ProductUpdateRequest productUpdateRequest) {
+        return productService
+                .update(id, conversionService.convert(productUpdateRequest, ImmutableProductUpdateDetails.class));
+    }
 
-  /**
-   * Deletes a product by its ID.
-   *
-   * @param id the ID of the product to be deleted
-   * @throws IllegalArgumentException if the provided id is null
-   * @throws ProductNotFoundException if no product is found with the given id
-   */
-  @Override
-  public void delete(final UUID id) {
-    productService.delete(id);
-  }
+    /**
+     * Deletes a product by its ID.
+     *
+     * @param id the ID of the product to be deleted
+     * @throws IllegalArgumentException if the provided id is null
+     * @throws ProductNotFoundException if no product is found with the given id
+     */
+    @Override
+    public void delete(final UUID id) {
+        productService.delete(id);
+    }
 
-  /**
-   * Searches for a product using criteria list.
-   *
-   * @param currency     displayed currency
-   * @param pageable     the pagination information
-   * @param criteriaList the criteria list
-   * @return a {@link Page} of {@link ProductData} representing the products
-   */
-  @Override
-  public Page<ProductDataResponse> search(final Currency currency,
-                                          final Pageable pageable,
-                                          final List<SearchCriteria> criteriaList) {
-    return productService
-        .search(currency, pageable, criteriaList)
-        .map(productData -> conversionService.convert(productData, ProductDataResponse.class));
-  }
+    /**
+     * Searches for a product using criteria list.
+     *
+     * @param currency     displayed currency
+     * @param pageable     the pagination information
+     * @param criteriaList the criteria list
+     * @return a {@link Page} of {@link ProductData} representing the products
+     */
+    @Override
+    public Page<ProductDataResponse> search(final Currency currency,
+                                            final Pageable pageable,
+                                            final List<SearchCriteria> criteriaList) {
+        return productService
+                .search(currency, pageable, criteriaList)
+                .map(productData -> conversionService.convert(productData, ProductDataResponse.class));
+    }
 }

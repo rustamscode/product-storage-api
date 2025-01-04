@@ -7,15 +7,15 @@ import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 
 @Component
 public class ProductUpdateRequestToImmutableProductUpdateDetailsConverter implements
-    Converter<ProductUpdateRequest, ImmutableProductUpdateDetails> {
-  @Override
-  public ImmutableProductUpdateDetails convert(ProductUpdateRequest productUpdateRequest) {
-    return ImmutableProductUpdateDetails.builder()
-        .productNumber(productUpdateRequest.getProductNumber())
-        .info(productUpdateRequest.getInfo())
-        .category(productUpdateRequest.getCategory())
-        .price(productUpdateRequest.getPrice())
-        .amount(productUpdateRequest.getAmount())
-        .build();
-  }
+        Converter<ProductUpdateRequest, ImmutableProductUpdateDetails> {
+    @Override
+    public ImmutableProductUpdateDetails convert(ProductUpdateRequest productUpdateRequest) {
+        return ImmutableProductUpdateDetails.builder()
+                .productNumber(productUpdateRequest.getProductNumber())
+                .info(productUpdateRequest.getInfo())
+                .category(productUpdateRequest.getCategory())
+                .price(productUpdateRequest.getPrice())
+                .amount(productUpdateRequest.getAmount())
+                .build();
+    }
 }

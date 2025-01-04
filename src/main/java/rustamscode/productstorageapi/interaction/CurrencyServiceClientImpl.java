@@ -23,32 +23,32 @@ import static java.time.Duration.ofSeconds;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CurrencyServiceClientImpl implements CurrencyServiceClient {
 
-  final WebClient webClient;
+    final WebClient webClient;
 
-  final RestProperties restProperties;
+    final RestProperties restProperties;
 
-  @Override
-  @Cacheable(value = "currencyCache", unless = "#result == null")
-  public @Nullable CurrencyRateDetails getCurrencyRateDetails() {
-    final String currencyUri = restProperties.getCurrencyServiceClient()
-        .getMethods()
-        .getGetCurrencyRate();
+    @Override
+    @Cacheable(value = "currencyCache", unless = "#result == null")
+    public @Nullable CurrencyRateDetails getCurrencyRateDetails() {
+        final String currencyUri = restProperties.getCurrencyServiceClient()
+                .getMethods()
+                .getGetCurrencyRate();
 
-    try {
-      return webClient
-          .get()
-          .uri(currencyUri)
-          .retrieve()
-          .bodyToMono(CurrencyRateDetails.class)
-          .retryWhen(Retry.fixedDelay(3, ofSeconds(2))
-              .doBeforeRetry(
-                  signal -> log.info("Retry attempt: {}", signal.totalRetries()
-                  )))
-          .onErrorMap(error -> new CurrencyRateFetchException(error.getMessage()))
-          .block();
-    } catch (Exception e) {
-      log.error("Error getting currency: {}", e.getMessage());
-      return null;
+        try {
+            return webClient
+                    .get()
+                    .uri(currencyUri)
+                    .retrieve()
+                    .bodyToMono(CurrencyRateDetails.class)
+                    .retryWhen(Retry.fixedDelay(3, ofSeconds(2))
+                            .doBeforeRetry(
+                                    signal -> log.info("Retry attempt: {}", signal.totalRetries()
+                                    )))
+                    .onErrorMap(error -> new CurrencyRateFetchException(error.getMessage()))
+                    .block();
+        } catch (Exception e) {
+            log.error("Error getting currency: {}", e.getMessage());
+            return null;
+        }
     }
-  }
 }
