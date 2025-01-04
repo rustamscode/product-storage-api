@@ -3,8 +3,8 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
 
-    <changeSet id="create-table-ordered-products" author="Rustamscode">
-        <sqlFile path="create-table-ordered-products.sql" relativeToChangelogFile="true"/>
+    <changeSet id="create-table-ordered-product" author="Rustamscode">
+        <sqlFile path="create-table-ordered-product.sql" relativeToChangelogFile="true"/>
     </changeSet>
 
 </databaseChangeLog>

@@ -24,7 +24,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Table(name = "products")
+@Table(name = "product")
 @Entity
 @Setter
 @Getter

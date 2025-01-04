@@ -29,7 +29,7 @@ import rustamscode.productstorageapi.enumeration.OrderStatus;
 import java.util.List;
 import java.util.UUID;
 
-@Table(name = "orders")
+@Table(name = "order")
 @Entity
 @Setter
 @Getter

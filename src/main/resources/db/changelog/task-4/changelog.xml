@@ -6,9 +6,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
 
-    <include file="create-table-customers.xml" relativeToChangelogFile="true"/>
-    <include file="create-table-orders.xml" relativeToChangelogFile="true"/>
-    <include file="create-table-ordered-products.xml" relativeToChangelogFile="true"/>
+    <include file="create-table-customer.xml" relativeToChangelogFile="true"/>
+    <include file="create-table-order.xml" relativeToChangelogFile="true"/>
+    <include file="create-table-ordered-product.xml" relativeToChangelogFile="true"/>
 
     <changeSet id="task-4" author="Rustamscode">
         <tagDatabase tag="task-4"/>

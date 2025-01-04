@@ -1,4 +1,4 @@
-CREATE TABLE customers
+CREATE TABLE customer
 (
     id BIGSERIAL PRIMARY KEY,
     login VARCHAR(32) UNIQUE NOT NULL,
@@ -6,9 +6,9 @@ CREATE TABLE customers
     is_active BOOLEAN NOT NULL
 );
 
-COMMENT ON TABLE customers IS 'Customers of the shop';
-COMMENT ON COLUMN customers.id IS 'Customer ID, serves as a primary key,'
+COMMENT ON TABLE customer IS 'Customers of the shop';
+COMMENT ON COLUMN customer.id IS 'Customer ID, serves as a primary key,'
     'can not be null and is generated automatically by AUTO_INCREMENT';
-COMMENT ON COLUMN customers.login IS 'Customer''s unique login, can not be null';
-COMMENT ON COLUMN customers.email IS 'Customer''s email, can not be null';
-COMMENT ON COLUMN customers.is_active IS 'Current customer''s activity status '
+COMMENT ON COLUMN customer.login IS 'Customer''s unique login, can not be null';
+COMMENT ON COLUMN customer.email IS 'Customer''s email, can not be null';
+COMMENT ON COLUMN customer.is_active IS 'Current customer''s activity status '

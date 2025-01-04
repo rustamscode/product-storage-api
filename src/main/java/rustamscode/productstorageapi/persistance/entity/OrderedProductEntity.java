@@ -23,7 +23,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Table(name = "ordered_products")
+@Table(name = "ordered_product")
 @Entity
 @Setter
 @Getter
