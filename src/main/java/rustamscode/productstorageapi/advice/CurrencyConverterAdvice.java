@@ -12,9 +12,9 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+import rustamscode.productstorageapi.currency.CurrencyProvider;
+import rustamscode.productstorageapi.currency.CurrencyRateProvider;
 import rustamscode.productstorageapi.enumeration.Currency;
-import rustamscode.productstorageapi.provider.CurrencyProvider;
-import rustamscode.productstorageapi.provider.CurrencyRateProvider;
 import rustamscode.productstorageapi.web.controller.ProductControllerImpl;
 import rustamscode.productstorageapi.web.dto.ProductDataResponse;
 
