@@ -16,7 +16,7 @@ import rustamscode.productstorageapi.enumeration.Currency;
 import rustamscode.productstorageapi.provider.CurrencyProvider;
 import rustamscode.productstorageapi.provider.CurrencyRateProvider;
 import rustamscode.productstorageapi.web.controller.ProductControllerImpl;
-import rustamscode.productstorageapi.web.dto.response.ProductDataResponse;
+import rustamscode.productstorageapi.web.dto.ProductDataResponse;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -38,7 +38,7 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
     Class<?> declaringClass = returnType.getMethod().getDeclaringClass();
 
     return SUPPORTED_METHODS.stream().anyMatch(methodName::contains)
-           && declaringClass == ProductControllerImpl.class;
+        && declaringClass == ProductControllerImpl.class;
   }
 
   @Override
@@ -72,4 +72,5 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
   private Page<ProductDataResponse> processResponsePage(Page<ProductDataResponse> page, Currency currency, BigDecimal currencyRate) {
     return page.map(response -> processResponse(response, currency, currencyRate));
   }
+
 }

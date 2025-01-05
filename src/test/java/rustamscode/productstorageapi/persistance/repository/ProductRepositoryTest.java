@@ -41,23 +41,23 @@ class ProductRepositoryTest extends RepositoryTest {
   @BeforeEach
   void setup() {
     expectedProduct1 = ObjectMother.productEntity()
-        .withName("Product1")
-        .withProductNumber(BigInteger.valueOf(1111))
-        .withPrice(BigDecimal.valueOf(1111))
-        .withCategory(Category.BOOKS)
-        .build();
+            .withName("Product1")
+            .withProductNumber(BigInteger.valueOf(1111))
+            .withPrice(BigDecimal.valueOf(1111))
+            .withCategory(Category.BOOKS)
+            .build();
     expectedProduct2 = ObjectMother.productEntity()
-        .withName("Product2")
-        .withProductNumber(BigInteger.valueOf(2222))
-        .withPrice(BigDecimal.valueOf(2222))
-        .withCategory(Category.FOOD)
-        .build();
+            .withName("Product2")
+            .withProductNumber(BigInteger.valueOf(2222))
+            .withPrice(BigDecimal.valueOf(2222))
+            .withCategory(Category.FOOD)
+            .build();
     expectedProduct3 = ObjectMother.productEntity()
-        .withName("Product3")
-        .withProductNumber(BigInteger.valueOf(3333))
-        .withPrice(BigDecimal.valueOf(3333))
-        .withCategory(Category.ELECTRONICS)
-        .build();
+            .withName("Product3")
+            .withProductNumber(BigInteger.valueOf(3333))
+            .withPrice(BigDecimal.valueOf(3333))
+           .withCategory(Category.ELECTRONICS)
+            .build();
   }
 
   @Override
@@ -110,18 +110,18 @@ class ProductRepositoryTest extends RepositoryTest {
 
     assertThat(actual).isNotEmpty();
     assertThat(actual)
-        .anySatisfy(product -> {
-          assertEquals(BigInteger.valueOf(1111), product.getProductNumber());
-          assertEquals(Category.BOOKS, product.getCategory());
-        })
-        .anySatisfy(product -> {
-          assertEquals(BigInteger.valueOf(2222), product.getProductNumber());
-          assertEquals(Category.FOOD, product.getCategory());
-        })
-        .anySatisfy(product -> {
-          assertEquals(BigInteger.valueOf(3333), product.getProductNumber());
-          assertEquals(Category.ELECTRONICS, product.getCategory());
-        });
+            .anySatisfy(product -> {
+              assertEquals(BigInteger.valueOf(1111), product.getProductNumber());
+              assertEquals(Category.BOOKS, product.getCategory());
+            })
+            .anySatisfy(product -> {
+              assertEquals(BigInteger.valueOf(2222), product.getProductNumber());
+              assertEquals(Category.FOOD, product.getCategory());
+            })
+            .anySatisfy(product -> {
+              assertEquals(BigInteger.valueOf(3333), product.getProductNumber());
+              assertEquals(Category.ELECTRONICS, product.getCategory());
+            });
   }
 
   @Test
@@ -147,11 +147,11 @@ class ProductRepositoryTest extends RepositoryTest {
     underTest.save(expectedProduct3);
     final ProductSpecification productSpecification = new ProductSpecification();
     final List<SearchCriteria> criteriaList = List.of(
-        StringSearchCriteria.builder()
-            .field("name")
-            .value("Product")
-            .operationType("LIKE")
-            .build()
+            StringSearchCriteria.builder()
+                    .field("name")
+                    .value("Product")
+                    .operationType("LIKE")
+                    .build()
     );
     final Pageable pageable = PageRequest.of(0, 5);
     final Specification<ProductEntity> specification = productSpecification.generateSpecification(criteriaList);
@@ -161,18 +161,18 @@ class ProductRepositoryTest extends RepositoryTest {
     assertThat(actual).isNotEmpty();
     assertThat(actual.getContent().size()).isEqualTo(3);
     assertThat(actual)
-        .anySatisfy(product -> {
-          assertEquals(BigInteger.valueOf(1111), product.getProductNumber());
-          assertEquals(Category.BOOKS, product.getCategory());
-        })
-        .anySatisfy(product -> {
-          assertEquals(BigInteger.valueOf(2222), product.getProductNumber());
-          assertEquals(Category.FOOD, product.getCategory());
-        })
-        .anySatisfy(product -> {
-          assertEquals(BigInteger.valueOf(3333), product.getProductNumber());
-          assertEquals(Category.ELECTRONICS, product.getCategory());
-        });
+            .anySatisfy(product -> {
+              assertEquals(BigInteger.valueOf(1111), product.getProductNumber());
+              assertEquals(Category.BOOKS, product.getCategory());
+            })
+            .anySatisfy(product -> {
+              assertEquals(BigInteger.valueOf(2222), product.getProductNumber());
+              assertEquals(Category.FOOD, product.getCategory());
+            })
+            .anySatisfy(product -> {
+              assertEquals(BigInteger.valueOf(3333), product.getProductNumber());
+              assertEquals(Category.ELECTRONICS, product.getCategory());
+            });
   }
 
   @Test
@@ -182,16 +182,16 @@ class ProductRepositoryTest extends RepositoryTest {
     underTest.save(expectedProduct3);
     final ProductSpecification productSpecification = new ProductSpecification();
     final List<SearchCriteria> criteriaList = List.of(
-        StringSearchCriteria.builder()
-            .field("name")
-            .value("Product")
-            .operationType("~")
-            .build(),
-        BigDecimalSearchCriteria.builder()
-            .field("price")
-            .value(BigDecimal.valueOf(1500))
-            .operationType(">=")
-            .build()
+            StringSearchCriteria.builder()
+                    .field("name")
+                    .value("Product")
+                    .operationType("~")
+                    .build(),
+            BigDecimalSearchCriteria.builder()
+                    .field("price")
+                    .value(BigDecimal.valueOf(1500))
+                    .operationType(">=")
+                    .build()
     );
     final Pageable pageable = PageRequest.of(0, 5);
     final Specification<ProductEntity> specification = productSpecification.generateSpecification(criteriaList);
@@ -201,13 +201,13 @@ class ProductRepositoryTest extends RepositoryTest {
     assertThat(actual).isNotEmpty();
     assertThat(actual.getContent().size()).isEqualTo(2);
     assertThat(actual)
-        .anySatisfy(product -> {
-          assertEquals(BigInteger.valueOf(2222), product.getProductNumber());
-          assertEquals(Category.FOOD, product.getCategory());
-        })
-        .anySatisfy(product -> {
-          assertEquals(BigInteger.valueOf(3333), product.getProductNumber());
-          assertEquals(Category.ELECTRONICS, product.getCategory());
-        });
+            .anySatisfy(product -> {
+              assertEquals(BigInteger.valueOf(2222), product.getProductNumber());
+              assertEquals(Category.FOOD, product.getCategory());
+            })
+            .anySatisfy(product -> {
+              assertEquals(BigInteger.valueOf(3333), product.getProductNumber());
+              assertEquals(Category.ELECTRONICS, product.getCategory());
+            });
   }
 }

@@ -19,8 +19,8 @@ import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
 import rustamscode.productstorageapi.service.dto.ProductData;
 import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
-import rustamscode.productstorageapi.web.dto.request.ProductCreateRequest;
-import rustamscode.productstorageapi.web.dto.response.ProductDataResponse;
+import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
+import rustamscode.productstorageapi.web.dto.ProductDataResponse;
 
 import java.util.List;
 import java.util.UUID;

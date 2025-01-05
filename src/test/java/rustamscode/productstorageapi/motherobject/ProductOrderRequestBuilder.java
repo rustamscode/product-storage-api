@@ -1,8 +1,8 @@
 package rustamscode.productstorageapi.motherobject;
 
 import lombok.Getter;
-import rustamscode.productstorageapi.web.dto.request.OrderedProductRequest;
-import rustamscode.productstorageapi.web.dto.request.ProductOrderRequest;
+import rustamscode.productstorageapi.web.dto.OrderedProductRequest;
+import rustamscode.productstorageapi.web.dto.ProductOrderRequest;
 
 import java.util.Arrays;
 import java.util.List;

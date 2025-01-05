@@ -2,7 +2,6 @@ package rustamscode.productstorageapi.motherobject;
 
 import lombok.Getter;
 import rustamscode.productstorageapi.service.dto.ImmutableOrderedProductObject;
-import rustamscode.productstorageapi.web.dto.request.OrderedProductRequest;
 
 import java.math.BigDecimal;
 import java.util.UUID;

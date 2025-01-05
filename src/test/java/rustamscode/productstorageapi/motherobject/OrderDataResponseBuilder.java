@@ -1,8 +1,8 @@
 package rustamscode.productstorageapi.motherobject;
 
 import lombok.Getter;
-import rustamscode.productstorageapi.web.dto.response.OrderDataResponse;
-import rustamscode.productstorageapi.web.dto.response.OrderedProductDataResponse;
+import rustamscode.productstorageapi.web.dto.OrderDataResponse;
+import rustamscode.productstorageapi.web.dto.OrderedProductDataResponse;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

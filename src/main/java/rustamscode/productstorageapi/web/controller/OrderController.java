@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import rustamscode.productstorageapi.enumeration.OrderStatus;
-import rustamscode.productstorageapi.web.dto.request.OrderedProductRequest;
-import rustamscode.productstorageapi.web.dto.request.ProductOrderRequest;
-import rustamscode.productstorageapi.web.dto.response.OrderDataResponse;
+import rustamscode.productstorageapi.web.dto.OrderedProductRequest;
+import rustamscode.productstorageapi.web.dto.ProductOrderRequest;
+import rustamscode.productstorageapi.web.dto.OrderDataResponse;
 
 import java.util.List;
 import java.util.UUID;

@@ -3,7 +3,7 @@ package rustamscode.productstorageapi.conversion;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
-import rustamscode.productstorageapi.web.dto.request.ProductCreateRequest;
+import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
 
 import java.time.LocalDateTime;
 

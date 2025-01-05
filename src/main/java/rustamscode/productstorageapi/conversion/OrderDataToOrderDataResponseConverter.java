@@ -4,8 +4,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import rustamscode.productstorageapi.service.dto.OrderData;
 import rustamscode.productstorageapi.service.dto.OrderedProductDataObject;
-import rustamscode.productstorageapi.web.dto.response.OrderDataResponse;
-import rustamscode.productstorageapi.web.dto.response.OrderedProductDataResponse;
+import rustamscode.productstorageapi.web.dto.OrderDataResponse;
+import rustamscode.productstorageapi.web.dto.OrderedProductDataResponse;
 
 import java.util.stream.Collectors;
 

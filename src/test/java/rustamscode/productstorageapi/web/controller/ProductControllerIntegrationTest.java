@@ -21,7 +21,7 @@ import rustamscode.productstorageapi.enumeration.Currency;
 import rustamscode.productstorageapi.motherobject.ObjectMother;
 import rustamscode.productstorageapi.service.ProductService;
 import rustamscode.productstorageapi.service.dto.ProductData;
-import rustamscode.productstorageapi.web.dto.response.ProductDataResponse;
+import rustamscode.productstorageapi.web.dto.ProductDataResponse;
 
 import java.util.UUID;
 
@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ProductControllerIntegrationTest {
 
   MockMvc mockMvc;
-  final ObjectMapper objectMapper = new ObjectMapper()
+  ObjectMapper objectMapper = new ObjectMapper()
       .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
       .registerModule(new JavaTimeModule());
 

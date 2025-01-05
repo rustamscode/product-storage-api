@@ -3,7 +3,7 @@ package rustamscode.productstorageapi.conversion;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import rustamscode.productstorageapi.service.dto.ImmutableOrderedProductObject;
-import rustamscode.productstorageapi.web.dto.request.OrderedProductRequest;
+import rustamscode.productstorageapi.web.dto.OrderedProductRequest;
 
 @Component
 public class OrderedProductRequestToImmutableOrderedProductObjectConverter

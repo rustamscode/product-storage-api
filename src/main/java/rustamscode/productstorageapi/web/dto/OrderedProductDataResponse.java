@@ -1,4 +1,4 @@
-package rustamscode.productstorageapi.web.dto.response;
+package rustamscode.productstorageapi.web.dto;
 
 import lombok.Builder;
 import lombok.Value;

@@ -10,8 +10,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import rustamscode.productstorageapi.web.controller.OrderControllerImpl;
-import rustamscode.productstorageapi.web.dto.response.OrderDataResponse;
-import rustamscode.productstorageapi.web.dto.response.OrderedProductDataResponse;
+import rustamscode.productstorageapi.web.dto.OrderDataResponse;
+import rustamscode.productstorageapi.web.dto.OrderedProductDataResponse;
 
 import java.math.BigDecimal;
 

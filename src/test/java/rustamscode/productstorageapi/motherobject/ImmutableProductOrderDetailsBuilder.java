@@ -3,7 +3,6 @@ package rustamscode.productstorageapi.motherobject;
 import lombok.Getter;
 import rustamscode.productstorageapi.service.dto.ImmutableProductOrderDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableOrderedProductObject;
-import rustamscode.productstorageapi.web.dto.request.ProductOrderRequest;
 
 import java.util.Arrays;
 import java.util.List;

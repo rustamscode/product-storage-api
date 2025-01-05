@@ -3,7 +3,7 @@ package rustamscode.productstorageapi.motherobject;
 import lombok.Getter;
 import rustamscode.productstorageapi.enumeration.Category;
 import rustamscode.productstorageapi.enumeration.Currency;
-import rustamscode.productstorageapi.web.dto.response.ProductDataResponse;
+import rustamscode.productstorageapi.web.dto.ProductDataResponse;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

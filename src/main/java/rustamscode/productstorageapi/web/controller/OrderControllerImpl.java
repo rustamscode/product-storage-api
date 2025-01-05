@@ -9,9 +9,9 @@ import rustamscode.productstorageapi.enumeration.OrderStatus;
 import rustamscode.productstorageapi.service.OrderService;
 import rustamscode.productstorageapi.service.dto.ImmutableOrderedProductObject;
 import rustamscode.productstorageapi.service.dto.ImmutableProductOrderDetails;
-import rustamscode.productstorageapi.web.dto.request.OrderedProductRequest;
-import rustamscode.productstorageapi.web.dto.request.ProductOrderRequest;
-import rustamscode.productstorageapi.web.dto.response.OrderDataResponse;
+import rustamscode.productstorageapi.web.dto.OrderedProductRequest;
+import rustamscode.productstorageapi.web.dto.ProductOrderRequest;
+import rustamscode.productstorageapi.web.dto.OrderDataResponse;
 
 import java.util.List;
 import java.util.UUID;

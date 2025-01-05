@@ -1,4 +1,4 @@
-package rustamscode.productstorageapi.web.dto.request;
+package rustamscode.productstorageapi.web.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
