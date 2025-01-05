@@ -38,7 +38,7 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
     Class<?> declaringClass = returnType.getMethod().getDeclaringClass();
 
     return SUPPORTED_METHODS.stream().anyMatch(methodName::contains)
-        && declaringClass == ProductControllerImpl.class;
+           && declaringClass == ProductControllerImpl.class;
   }
 
   @Override
@@ -49,8 +49,8 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
                                 ServerHttpRequest request, ServerHttpResponse response) {
     if (body == null) return null;
 
-    Currency currency = currencyProvider.getCurrency();
-    BigDecimal currencyRate = currencyRateProvider.getCurrencyRate(currencyProvider.getCurrency());
+    final Currency currency = currencyProvider.getCurrency();
+    final BigDecimal currencyRate = currencyRateProvider.getCurrencyRate(currency);
 
     if (body instanceof ProductDataResponse responseBody) {
       return processResponse(responseBody, currency, currencyRate);
@@ -73,4 +73,3 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
     return page.map(response -> processResponse(response, currency, currencyRate));
   }
 }
-

@@ -1,8 +1,6 @@
 package rustamscode.productstorageapi.service;
 
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
@@ -34,22 +32,51 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation for managing orders in the system.
+ * Provides methods for creation, updating, retrieval, and deletion of orders.
+ */
+
 @Slf4j
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-  final OrderRepository orderRepository;
+  /**
+   * Repository for managing {@link OrderEntity}.
+   */
+  private final OrderRepository orderRepository;
 
-  final OrderedProductRepository orderedProductRepository;
+  /**
+   * Repository for managing {@link OrderedProductEntity}.
+   */
+  private final OrderedProductRepository orderedProductRepository;
 
-  final CustomerRepository customerRepository;
+  /**
+   * Repository for managing {@link CustomerEntity}.
+   */
+  private final CustomerRepository customerRepository;
 
-  final ProductRepository productRepository;
+  /**
+   * Repository for managing {@link ProductEntity}.
+   */
+  private final ProductRepository productRepository;
 
-  final ConversionService conversionService;
+  /**
+   * Conversion service for mapping between DTOs and entities.
+   */
+  private final ConversionService conversionService;
 
+  /**
+   * Creates a new order for a specific customer with the specified products.
+   *
+   * @param customerId                   The ID of the customer.
+   * @param immutableProductOrderDetails DTO of the ordered product.
+   * @return The ID of the created order.
+   * @throws CustomerNotFoundException    If the customer does not exist.
+   * @throws UnavailableProductException  If any product is unavailable.
+   * @throws InsufficientProductException If the product stock is insufficient.
+   */
   @Override
   public UUID create(final Long customerId,
                      final ImmutableProductOrderDetails immutableProductOrderDetails) {
@@ -81,6 +108,18 @@ public class OrderServiceImpl implements OrderService {
     return savedOrder.getId();
   }
 
+  /**
+   * Updates an existing order by adding or modifying the ordered products.
+   *
+   * @param id                    The ID of the order to update.
+   * @param customerId            The ID of the customer associated with the order.
+   * @param orderedProductObjects List of products to update or add to the order.
+   * @return The ID of the updated order.
+   * @throws OrderNotFoundException      If the order does not exist.
+   * @throws CustomerNotFoundException   If the customer does not exist.
+   * @throws OrderAccessDeniedException  If the customer does not own the order.
+   * @throws IllegalOrderAccessException If the order status is not modifiable.
+   */
   @Override
   public UUID update(final UUID id,
                      final Long customerId,
@@ -118,6 +157,16 @@ public class OrderServiceImpl implements OrderService {
     return id;
   }
 
+  /**
+   * Finds an order by its ID and verifies ownership by the customer.
+   *
+   * @param id         The ID of the order to retrieve.
+   * @param customerId The ID of the customer.
+   * @return The detailed order data.
+   * @throws OrderNotFoundException     If the order does not exist.
+   * @throws CustomerNotFoundException  If the customer does not exist.
+   * @throws OrderAccessDeniedException If the customer does not own the order.
+   */
   @Override
   public OrderData findById(final UUID id, final Long customerId) {
     Assert.notNull(id, "Order ID must not be null");
@@ -138,6 +187,16 @@ public class OrderServiceImpl implements OrderService {
         .build();
   }
 
+  /**
+   * Cancels an existing order and reverts the product quantities.
+   *
+   * @param id         The ID of the order to cancel.
+   * @param customerId The ID of the customer associated with the order.
+   * @throws OrderNotFoundException      If the order does not exist.
+   * @throws CustomerNotFoundException   If the customer does not exist.
+   * @throws OrderAccessDeniedException  If the customer does not own the order.
+   * @throws IllegalOrderAccessException If the order status is not cancellable.
+   */
   @Override
   public void delete(final UUID id, final Long customerId) {
     Assert.notNull(id, "Order ID must not be null");
@@ -174,6 +233,17 @@ public class OrderServiceImpl implements OrderService {
     //TODO Implementation
   }
 
+  /**
+   * Updates the status of an order.
+   *
+   * @param id         The ID of the order.
+   * @param customerId The ID of the customer associated with the order.
+   * @param status     The new status to set for the order.
+   * @return The ID of the updated order.
+   * @throws OrderNotFoundException     If the order does not exist.
+   * @throws CustomerNotFoundException  If the customer does not exist.
+   * @throws OrderAccessDeniedException If the customer does not own the order.
+   */
   @Override
   public UUID updateStatus(final UUID id, final Long customerId, final OrderStatus status) {
     Assert.notNull(id, "Order ID must not be null");
@@ -196,6 +266,12 @@ public class OrderServiceImpl implements OrderService {
     return order.getId();
   }
 
+  /**
+   * Maps a list of product order DTOs to a list of {@link OrderedProductEntity}.
+   *
+   * @param orderedProductObjects List of product order DTOs.
+   * @return List of {@link OrderedProductEntity}.
+   */
   private List<OrderedProductEntity> mapToOrderedProducts(final List<ImmutableOrderedProductObject> orderedProductObjects) {
     return orderedProductObjects.stream()
         .map(orderedProductObject -> {
@@ -225,6 +301,13 @@ public class OrderServiceImpl implements OrderService {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Filters and returns the list of ordered products that don't already exist in the order.
+   *
+   * @param orderedProducts List of all ordered products.
+   * @param order           The existing order entity.
+   * @return List of newly ordered products.
+   */
   private List<OrderedProductEntity> filterUpdatedOrderedProductsFromExisting(final List<OrderedProductEntity> orderedProducts,
                                                                               final OrderEntity order) {
     return orderedProducts.stream().filter(orderedProduct -> {

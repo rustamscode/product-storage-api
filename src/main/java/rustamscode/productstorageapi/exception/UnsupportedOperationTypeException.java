@@ -7,6 +7,6 @@ public class UnsupportedOperationTypeException extends RuntimeException {
 
   public UnsupportedOperationTypeException(String operationType, String criteriaName) {
     super("Operation type " + operationType + " is not supported for "
-        + criteriaName + ".");
+          + criteriaName + ".");
   }
 }

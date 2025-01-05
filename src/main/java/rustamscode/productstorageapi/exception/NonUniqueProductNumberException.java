@@ -10,6 +10,6 @@ public class NonUniqueProductNumberException extends RuntimeException {
 
   public NonUniqueProductNumberException(BigInteger productNumber, UUID id) {
     super("The product with product number " + productNumber
-        + " already exists with ID " + id + ".");
+          + " already exists with ID " + id + ".");
   }
 }

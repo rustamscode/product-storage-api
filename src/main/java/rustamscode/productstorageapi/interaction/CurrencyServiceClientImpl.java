@@ -51,5 +51,4 @@ public class CurrencyServiceClientImpl implements CurrencyServiceClient {
       return null;
     }
   }
-
 }

@@ -24,9 +24,11 @@ public class CurrencySetterFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    final Optional<String> currency = Optional.ofNullable(request.getHeader("currency"));
+    final String currency = request.getHeader("currency");
+    Optional.ofNullable(currency)
+        .map(Currency::valueOf)
+        .ifPresent(currencyProvider::setCurrency);
 
-    currency.ifPresent(c -> currencyProvider.setCurrency(Currency.valueOf(c)));
     filterChain.doFilter(request, response);
   }
 }
