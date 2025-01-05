@@ -72,5 +72,4 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
   private Page<ProductDataResponse> processResponsePage(Page<ProductDataResponse> page, Currency currency, BigDecimal currencyRate) {
     return page.map(response -> processResponse(response, currency, currencyRate));
   }
-
 }
