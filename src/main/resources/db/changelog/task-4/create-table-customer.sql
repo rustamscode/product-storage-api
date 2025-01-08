@@ -1,9 +1,9 @@
 CREATE TABLE customer
 (
-    id BIGSERIAL PRIMARY KEY,
-    login VARCHAR(32) UNIQUE NOT NULL,
-    email VARCHAR(64) NOT NULL,
-    is_active BOOLEAN NOT NULL
+    id        BIGSERIAL PRIMARY KEY,
+    login     VARCHAR(32) UNIQUE NOT NULL,
+    email     VARCHAR(64)        NOT NULL,
+    is_active BOOLEAN            NOT NULL
 );
 
 COMMENT ON TABLE customer IS 'Customers of the shop';

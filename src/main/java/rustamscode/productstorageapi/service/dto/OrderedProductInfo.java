@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Value
 @Builder
-public class ImmutableOrderedProductObject {
+public class OrderedProductInfo {
 
   UUID id;
 

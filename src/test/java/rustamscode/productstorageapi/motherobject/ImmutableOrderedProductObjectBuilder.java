@@ -1,7 +1,7 @@
 package rustamscode.productstorageapi.motherobject;
 
 import lombok.Getter;
-import rustamscode.productstorageapi.service.dto.ImmutableOrderedProductObject;
+import rustamscode.productstorageapi.service.dto.OrderedProductInfo;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -31,8 +31,8 @@ public class ImmutableOrderedProductObjectBuilder {
     return this;
   }
 
-  public ImmutableOrderedProductObject build() {
-    return ImmutableOrderedProductObject.builder()
+  public OrderedProductInfo build() {
+    return OrderedProductInfo.builder()
         .id(id)
         .amount(amount)
         .build();

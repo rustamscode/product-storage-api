@@ -45,11 +45,6 @@ public class CustomerEntityBuilder {
   }
 
   public CustomerEntity build() {
-    return CustomerEntity.builder()
-        .id(id)
-        .login(login)
-        .email(email)
-        .isActive(isActive)
-        .build();
+    return new CustomerEntity(id, login, email, isActive);
   }
 }

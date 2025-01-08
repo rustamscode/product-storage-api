@@ -2,8 +2,8 @@ package rustamscode.productstorageapi.conversion;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+import rustamscode.productstorageapi.persistance.projection.OrderedProductProjection;
 import rustamscode.productstorageapi.service.dto.OrderData;
-import rustamscode.productstorageapi.service.dto.OrderedProductDataObject;
 import rustamscode.productstorageapi.web.dto.OrderDataResponse;
 import rustamscode.productstorageapi.web.dto.OrderedProductDataResponse;
 
@@ -22,12 +22,12 @@ public class OrderDataToOrderDataResponseConverter implements Converter<OrderDat
         .build();
   }
 
-  private OrderedProductDataResponse convertToOrderedProductDataResponse(final OrderedProductDataObject productDataObject) {
+  private OrderedProductDataResponse convertToOrderedProductDataResponse(final OrderedProductProjection orderedProductProjection) {
     return OrderedProductDataResponse.builder()
-        .productId(productDataObject.getProductId())
-        .name(productDataObject.getName())
-        .price(productDataObject.getPrice())
-        .amount(productDataObject.getAmount())
+        .productId(orderedProductProjection.getProductId())
+        .name(orderedProductProjection.getName())
+        .price(orderedProductProjection.getPrice())
+        .amount(orderedProductProjection.getAmount())
         .build();
   }
 }

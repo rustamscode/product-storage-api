@@ -10,5 +10,5 @@ import java.util.List;
 public class ImmutableProductOrderDetails {
 
   String deliveryAddress;
-  List<ImmutableOrderedProductObject> products;
+  List<OrderedProductInfo> products;
 }

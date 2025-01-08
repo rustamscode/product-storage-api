@@ -1,9 +1,9 @@
 CREATE TABLE "order"
 (
-    id UUID PRIMARY KEY,
-    customer_id BIGINT REFERENCES customer(id) NOT NULL,
-    status VARCHAR(32) NOT NULL,
-    delivery_address VARCHAR(128) NOT NULL
+    id               UUID PRIMARY KEY,
+    customer_id      BIGINT REFERENCES customer (id) NOT NULL,
+    status           VARCHAR(32)                     NOT NULL,
+    delivery_address VARCHAR(128)                    NOT NULL
 );
 
 COMMENT ON TABLE "order" IS 'Product orders';

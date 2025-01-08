@@ -2,8 +2,8 @@ package rustamscode.productstorageapi.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import rustamscode.productstorageapi.enumeration.OrderStatus;
 import rustamscode.productstorageapi.exception.CustomerNotFoundException;
@@ -22,15 +22,19 @@ import rustamscode.productstorageapi.persistance.repository.CustomerRepository;
 import rustamscode.productstorageapi.persistance.repository.OrderRepository;
 import rustamscode.productstorageapi.persistance.repository.OrderedProductRepository;
 import rustamscode.productstorageapi.persistance.repository.ProductRepository;
-import rustamscode.productstorageapi.service.dto.ImmutableOrderedProductObject;
-import rustamscode.productstorageapi.service.dto.ImmutableProductOrderDetails;
 import rustamscode.productstorageapi.service.dto.OrderData;
+import rustamscode.productstorageapi.service.dto.OrderStatusChangeInfo;
+import rustamscode.productstorageapi.service.dto.OrderedProductInfo;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static java.util.function.Function.identity;
 
 /**
  * Service implementation for managing orders in the system.
@@ -63,33 +67,32 @@ public class OrderServiceImpl implements OrderService {
   private final ProductRepository productRepository;
 
   /**
-   * Conversion service for mapping between DTOs and entities.
-   */
-  private final ConversionService conversionService;
-
-  /**
    * Creates a new order for a specific customer with the specified products.
    *
-   * @param customerId                   The ID of the customer.
-   * @param immutableProductOrderDetails DTO of the ordered product.
+   * @param customerId The ID of the customer.
+   * @param address    The order address.
+   * @param products   Products that were ordered.
    * @return The ID of the created order.
    * @throws CustomerNotFoundException    If the customer does not exist.
    * @throws UnavailableProductException  If any product is unavailable.
    * @throws InsufficientProductException If the product stock is insufficient.
    */
   @Override
+  @Transactional
   public UUID create(final Long customerId,
-                     final ImmutableProductOrderDetails immutableProductOrderDetails) {
+                     final String address,
+                     final List<OrderedProductInfo> products) {
     Assert.notNull(customerId, "Customer ID must not be null");
-    Assert.notNull(immutableProductOrderDetails, "Order details must not be null");
-
-    final List<ImmutableOrderedProductObject> orderedProductObjects = immutableProductOrderDetails.getProducts();
+    Assert.notNull(address, "Address must not be null");
+    Assert.notNull(products, "Products must not be null");
 
     final CustomerEntity customer = customerRepository.findById(customerId)
         .orElseThrow(() -> new CustomerNotFoundException(customerId));
 
-    final List<OrderedProductEntity> orderedProducts = mapToOrderedProducts(orderedProductObjects);
-    final OrderEntity order = conversionService.convert(immutableProductOrderDetails, OrderEntity.class);
+    final List<OrderedProductEntity> orderedProducts = mapToOrderedProducts(products);
+    final OrderEntity order = new OrderEntity();
+    order.setOrderStatus(OrderStatus.CREATED);
+    order.setDeliveryAddress(address);
     order.setCustomer(customer);
     final OrderEntity savedOrder = orderRepository.save(order);
     log.info("Order was saved without products");
@@ -121,9 +124,10 @@ public class OrderServiceImpl implements OrderService {
    * @throws IllegalOrderAccessException If the order status is not modifiable.
    */
   @Override
+  @Transactional
   public UUID update(final UUID id,
                      final Long customerId,
-                     final List<ImmutableOrderedProductObject> orderedProductObjects) {
+                     final List<OrderedProductInfo> orderedProductObjects) {
     Assert.notNull(id, "Order ID must not be null");
     Assert.notNull(customerId, "Customer ID must not be null");
     Assert.notNull(orderedProductObjects, "Ordered product list must not be null");
@@ -133,7 +137,7 @@ public class OrderServiceImpl implements OrderService {
     customerRepository.findById(customerId)
         .orElseThrow(() -> new CustomerNotFoundException(customerId));
 
-    if (!order.getCustomer().getId().equals(customerId)) {
+    if (!Objects.equals(order.getCustomer().getId(), customerId)) {
       throw new OrderAccessDeniedException(id, customerId);
     }
 
@@ -141,16 +145,38 @@ public class OrderServiceImpl implements OrderService {
       throw new IllegalOrderAccessException(order.getOrderStatus());
     }
 
-    final List<OrderedProductEntity> updatedOrderedProducts = filterUpdatedOrderedProductsFromExisting(
-        mapToOrderedProducts(orderedProductObjects), order
-    );
+    final List<OrderedProductEntity> orderedProducts = mapToOrderedProducts(orderedProductObjects);
 
-    updatedOrderedProducts.forEach(orderedProduct -> {
-      orderedProduct.setOrder(order);
+    orderedProducts.forEach(orderedProduct -> {
       orderedProduct.setId(new OrderedProductEntityKey(orderedProduct.getProduct().getId(), order.getId()));
+      orderedProduct.setOrder(order);
     });
 
-    order.getOrderedProducts().addAll(updatedOrderedProducts);
+    final List<OrderedProductEntityKey> orderedProductIds = orderedProducts.stream()
+        .map(OrderedProductEntity::getId)
+        .collect(Collectors.toList());
+
+    final Map<OrderedProductEntityKey, OrderedProductEntity> existingProductMap = orderedProductRepository
+        .findAllById(orderedProductIds).stream()
+        .collect(Collectors.toMap(OrderedProductEntity::getId, identity()));
+
+    final List<OrderedProductEntity> existingProducts = orderedProducts.stream()
+        .filter(orderedProduct -> existingProductMap.containsKey(orderedProduct.getId()))
+        .map(orderedProduct -> {
+          final OrderedProductEntity existing = existingProductMap.get(orderedProduct.getId());
+          final BigDecimal newAmount = existing.getAmount().add(orderedProduct.getAmount());
+          existing.setAmount(newAmount);
+          existing.setPrice(orderedProduct.getPrice());
+          return existing;
+        })
+        .toList();
+
+    final List<OrderedProductEntity> newProducts = orderedProducts.stream()
+        .filter(orderedProduct -> !existingProductMap.containsKey(orderedProduct.getId()))
+        .collect(Collectors.toList());
+
+    order.getOrderedProducts().addAll(newProducts);
+    orderedProductRepository.saveAll(existingProducts);
     orderRepository.save(order);
     log.info("Updated order was saved");
 
@@ -168,6 +194,7 @@ public class OrderServiceImpl implements OrderService {
    * @throws OrderAccessDeniedException If the customer does not own the order.
    */
   @Override
+  @Transactional
   public OrderData findById(final UUID id, final Long customerId) {
     Assert.notNull(id, "Order ID must not be null");
     Assert.notNull(customerId, "Customer ID must not be null");
@@ -177,13 +204,17 @@ public class OrderServiceImpl implements OrderService {
     customerRepository.findById(customerId)
         .orElseThrow(() -> new CustomerNotFoundException(customerId));
 
-    if (!order.getCustomer().getId().equals(customerId)) {
+    if (!Objects.equals(order.getCustomer().getId(), customerId)) {
       throw new OrderAccessDeniedException(id, customerId);
     }
 
     return OrderData.builder()
         .orderId(id)
-        .orderedProducts(Optional.ofNullable(orderedProductRepository.findAllByOrderId(id)).orElseThrow())
+        .orderedProducts(Optional.ofNullable(orderedProductRepository.findProjectionsByOrderId(id)).orElseThrow())
+        .totalPrice(order.getOrderedProducts().stream()
+            .map(it -> it.getPrice().multiply(it.getAmount()))
+            .reduce(BigDecimal.ZERO, BigDecimal::add)
+        )
         .build();
   }
 
@@ -198,6 +229,7 @@ public class OrderServiceImpl implements OrderService {
    * @throws IllegalOrderAccessException If the order status is not cancellable.
    */
   @Override
+  @Transactional
   public void delete(final UUID id, final Long customerId) {
     Assert.notNull(id, "Order ID must not be null");
     Assert.notNull(customerId, "Customer ID must not be null");
@@ -207,7 +239,7 @@ public class OrderServiceImpl implements OrderService {
     customerRepository.findById(customerId)
         .orElseThrow(() -> new CustomerNotFoundException(customerId));
 
-    if (!order.getCustomer().getId().equals(customerId)) {
+    if (!Objects.equals(order.getCustomer().getId(), customerId)) {
       throw new OrderAccessDeniedException(id, customerId);
     }
 
@@ -225,10 +257,13 @@ public class OrderServiceImpl implements OrderService {
       productRepository.save(product);
     });
 
+    //orderRepository.save(order);
+
     log.info("The order was deleted");
   }
 
   @Override
+  @Transactional
   public void confirm(final UUID id, final Long customerId) {
     //TODO Implementation
   }
@@ -245,7 +280,8 @@ public class OrderServiceImpl implements OrderService {
    * @throws OrderAccessDeniedException If the customer does not own the order.
    */
   @Override
-  public UUID updateStatus(final UUID id, final Long customerId, final OrderStatus status) {
+  @Transactional
+  public UUID updateStatus(final UUID id, final Long customerId, final OrderStatusChangeInfo status) {
     Assert.notNull(id, "Order ID must not be null");
     Assert.notNull(customerId, "Customer ID must not be null");
     Assert.notNull(status, "Order status must not bu null");
@@ -255,11 +291,11 @@ public class OrderServiceImpl implements OrderService {
     customerRepository.findById(customerId)
         .orElseThrow(() -> new CustomerNotFoundException(customerId));
 
-    if (!order.getCustomer().getId().equals(customerId)) {
+    if (!Objects.equals(order.getCustomer().getId(), customerId)) {
       throw new OrderAccessDeniedException(id, customerId);
     }
 
-    order.setOrderStatus(status);
+    order.setOrderStatus(status.getStatus());
     orderRepository.save(order);
     log.info("Order status was updated");
 
@@ -269,16 +305,22 @@ public class OrderServiceImpl implements OrderService {
   /**
    * Maps a list of product order DTOs to a list of {@link OrderedProductEntity}.
    *
-   * @param orderedProductObjects List of product order DTOs.
+   * @param orderedProductInfos List of product order DTOs.
    * @return List of {@link OrderedProductEntity}.
    */
-  private List<OrderedProductEntity> mapToOrderedProducts(final List<ImmutableOrderedProductObject> orderedProductObjects) {
-    return orderedProductObjects.stream()
+  private List<OrderedProductEntity> mapToOrderedProducts(final List<OrderedProductInfo> orderedProductInfos) {
+    final List<UUID> productIds = orderedProductInfos.stream()
+        .map(OrderedProductInfo::getId)
+        .collect(Collectors.toList());
+    final Map<UUID, ProductEntity> productMap = productRepository.findAllById(productIds).stream()
+        .collect(Collectors.toMap(ProductEntity::getId, identity()));
+
+    return orderedProductInfos.stream()
         .map(orderedProductObject -> {
           UUID productId = orderedProductObject.getId();
 
-          final ProductEntity product = productRepository.findById(productId)
-              .orElseThrow(() -> new ProductNotFoundException(productId));
+          final ProductEntity product = productMap.getOrDefault(productId, null);
+          Optional.ofNullable(product).orElseThrow(() -> new ProductNotFoundException(productId));
 
           if (!product.getIsAvailable()) {
             throw new UnavailableProductException(productId);
@@ -292,37 +334,12 @@ public class OrderServiceImpl implements OrderService {
           product.setAmount(amountAfterOrder);
           productRepository.save(product);
 
-          return OrderedProductEntity.builder()
-              .product(product)
-              .price(product.getPrice())
-              .amount(orderedProductObject.getAmount())
-              .build();
-        })
-        .collect(Collectors.toList());
-  }
+          OrderedProductEntity orderedProduct = new OrderedProductEntity();
+          orderedProduct.setProduct(product);
+          orderedProduct.setPrice(product.getPrice());
+          orderedProduct.setAmount(orderedProductObject.getAmount());
 
-  /**
-   * Filters and returns the list of ordered products that don't already exist in the order.
-   *
-   * @param orderedProducts List of all ordered products.
-   * @param order           The existing order entity.
-   * @return List of newly ordered products.
-   */
-  private List<OrderedProductEntity> filterUpdatedOrderedProductsFromExisting(final List<OrderedProductEntity> orderedProducts,
-                                                                              final OrderEntity order) {
-    return orderedProducts.stream().filter(orderedProduct -> {
-          final OrderedProductEntityKey orderedProductKey = new OrderedProductEntityKey(
-              orderedProduct.getProduct().getId(), order.getId()
-          );
-
-          return orderedProductRepository.findById(orderedProductKey)
-              .map(existing -> {
-                final BigDecimal newAmount = existing.getAmount().add(orderedProduct.getAmount());
-                existing.setAmount(newAmount);
-                existing.setPrice(orderedProduct.getPrice());
-                orderedProductRepository.save(existing);
-                return false;
-              }).orElse(true);
+          return orderedProduct;
         })
         .collect(Collectors.toList());
   }

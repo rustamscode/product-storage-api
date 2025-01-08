@@ -2,19 +2,19 @@ package rustamscode.productstorageapi.conversion;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import rustamscode.productstorageapi.service.dto.ImmutableOrderedProductObject;
 import rustamscode.productstorageapi.service.dto.ImmutableProductOrderDetails;
+import rustamscode.productstorageapi.service.dto.OrderedProductInfo;
+import rustamscode.productstorageapi.web.dto.CreateOrderRequest;
 import rustamscode.productstorageapi.web.dto.OrderedProductRequest;
-import rustamscode.productstorageapi.web.dto.ProductOrderRequest;
 
 import java.util.stream.Collectors;
 
 @Component
 public class ProductOrderRequestToImmutableProductOrderDetailsConverter
-    implements Converter<ProductOrderRequest, ImmutableProductOrderDetails> {
+    implements Converter<CreateOrderRequest, ImmutableProductOrderDetails> {
 
   @Override
-  public ImmutableProductOrderDetails convert(ProductOrderRequest request) {
+  public ImmutableProductOrderDetails convert(CreateOrderRequest request) {
     return ImmutableProductOrderDetails.builder()
         .deliveryAddress(request.getDeliveryAddress())
         .products(request.getProducts().stream()
@@ -23,8 +23,8 @@ public class ProductOrderRequestToImmutableProductOrderDetailsConverter
         .build();
   }
 
-  private ImmutableOrderedProductObject convertToOrderedProductObject(OrderedProductRequest request) {
-    return ImmutableOrderedProductObject.builder()
+  private OrderedProductInfo convertToOrderedProductObject(OrderedProductRequest request) {
+    return OrderedProductInfo.builder()
         .id(request.getId())
         .amount(request.getAmount())
         .build();

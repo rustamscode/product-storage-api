@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductOrderRequest {
+public class CreateOrderRequest {
   @NotBlank
   @Size(min = 1, max = 64, message = "Address must not be blank or exceed 64 characters!")
   String deliveryAddress;

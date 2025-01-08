@@ -5,13 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import rustamscode.productstorageapi.enumeration.OrderStatus;
 import rustamscode.productstorageapi.service.OrderService;
-import rustamscode.productstorageapi.service.dto.ImmutableOrderedProductObject;
-import rustamscode.productstorageapi.service.dto.ImmutableProductOrderDetails;
-import rustamscode.productstorageapi.web.dto.OrderedProductRequest;
-import rustamscode.productstorageapi.web.dto.ProductOrderRequest;
+import rustamscode.productstorageapi.service.dto.OrderStatusChangeInfo;
+import rustamscode.productstorageapi.service.dto.OrderedProductInfo;
+import rustamscode.productstorageapi.web.dto.CreateOrderRequest;
 import rustamscode.productstorageapi.web.dto.OrderDataResponse;
+import rustamscode.productstorageapi.web.dto.OrderStatusChangeRequest;
+import rustamscode.productstorageapi.web.dto.OrderedProductRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,11 +47,16 @@ public class OrderControllerImpl implements OrderController {
    * @return The ID of the created order.
    */
   @Override
-  public UUID create(final Long customerId, final ProductOrderRequest request) {
+  public UUID create(final Long customerId, final CreateOrderRequest request) {
     return orderService.create(
         customerId,
-        conversionService.convert(request, ImmutableProductOrderDetails.class)
+        request.getDeliveryAddress(),
+        request.getProducts()
+            .stream()
+            .map(product -> conversionService.convert(product, OrderedProductInfo.class))
+            .collect(Collectors.toList())
     );
+
   }
 
   /**
@@ -64,14 +69,14 @@ public class OrderControllerImpl implements OrderController {
    */
   @Override
   public UUID update(final UUID id, final Long customerId, final List<OrderedProductRequest> orderedProducts) {
-    final List<ImmutableOrderedProductObject> immutableOrderedProducts = orderedProducts.stream()
+    final List<OrderedProductInfo> orderedProductInfos = orderedProducts.stream()
         .map(
             orderedProduct ->
-                conversionService.convert(orderedProduct, ImmutableOrderedProductObject.class)
+                conversionService.convert(orderedProduct, OrderedProductInfo.class)
         )
         .collect(Collectors.toList());
 
-    return orderService.update(id, customerId, immutableOrderedProducts);
+    return orderService.update(id, customerId, orderedProductInfos);
   }
 
   /**
@@ -111,7 +116,7 @@ public class OrderControllerImpl implements OrderController {
    * @return The ID of the order with the updated status.
    */
   @Override
-  public UUID updateStatus(final UUID id, final Long customerId, final OrderStatus status) {
-    return orderService.updateStatus(id, customerId, status);
+  public UUID updateStatus(final UUID id, final Long customerId, final OrderStatusChangeRequest status) {
+    return orderService.updateStatus(id, customerId, conversionService.convert(status, OrderStatusChangeInfo.class));
   }
 }

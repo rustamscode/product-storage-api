@@ -1,8 +1,8 @@
 package rustamscode.productstorageapi.motherobject;
 
 import lombok.Getter;
+import rustamscode.productstorageapi.web.dto.CreateOrderRequest;
 import rustamscode.productstorageapi.web.dto.OrderedProductRequest;
-import rustamscode.productstorageapi.web.dto.ProductOrderRequest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,8 +36,8 @@ public class ProductOrderRequestBuilder {
     return this;
   }
 
-  public ProductOrderRequest build() {
-    return ProductOrderRequest.builder()
+  public CreateOrderRequest build() {
+    return CreateOrderRequest.builder()
         .deliveryAddress(deliveryAddress)
         .products(products)
         .build();

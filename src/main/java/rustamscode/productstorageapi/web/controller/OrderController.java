@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import rustamscode.productstorageapi.enumeration.OrderStatus;
-import rustamscode.productstorageapi.web.dto.OrderedProductRequest;
-import rustamscode.productstorageapi.web.dto.ProductOrderRequest;
+import rustamscode.productstorageapi.web.dto.CreateOrderRequest;
 import rustamscode.productstorageapi.web.dto.OrderDataResponse;
+import rustamscode.productstorageapi.web.dto.OrderStatusChangeRequest;
+import rustamscode.productstorageapi.web.dto.OrderedProductRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +30,7 @@ public interface OrderController {
   @Operation(summary = "Create a order")
   @ResponseStatus(HttpStatus.CREATED)
   UUID create(@RequestHeader final Long customerId,
-              @Valid @NotNull @RequestBody final ProductOrderRequest request);
+              @Valid @NotNull @RequestBody final CreateOrderRequest request);
 
   @PatchMapping("/{id}")
   @Operation(summary = "Update an order")
@@ -57,5 +57,5 @@ public interface OrderController {
   @Operation(summary = "Check order status")
   UUID updateStatus(@PathVariable final UUID id,
                     @RequestHeader final Long customerId,
-                    @RequestBody @NotNull final OrderStatus status);
+                    @RequestBody @NotNull final OrderStatusChangeRequest status);
 }

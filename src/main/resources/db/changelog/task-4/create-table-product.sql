@@ -25,3 +25,4 @@ COMMENT ON COLUMN product.amount IS 'Product amount, a number with 10 in precisi
 COMMENT ON COLUMN product.last_amount_update IS 'A TIMESTAMP of the latest time the product was updated';
 COMMENT ON COLUMN product.creation_time IS 'A TIMESTAMP of product creation time, is generated automatically';
 COMMENT ON COLUMN product.version IS 'Contains a version that is used for synchronizing';
+COMMENT ON COLUMN product.is_available IS 'Availability of the product'

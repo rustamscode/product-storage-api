@@ -6,17 +6,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import rustamscode.productstorageapi.persistance.entity.OrderedProductEntity;
 import rustamscode.productstorageapi.persistance.entity.key.OrderedProductEntityKey;
-import rustamscode.productstorageapi.service.dto.OrderedProductDataObject;
+import rustamscode.productstorageapi.persistance.projection.OrderedProductProjection;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface OrderedProductRepository extends JpaRepository<OrderedProductEntity, OrderedProductEntityKey> {
 
   @Query("""
-      SELECT new rustamscode.productstorageapi.service.dto.OrderedProductDataObject(
+      SELECT new    rustamscode.productstorageapi.persistance.projection.OrderedProductProjection(
           op.product.id,
           p.name,
           op.amount,
@@ -26,5 +25,14 @@ public interface OrderedProductRepository extends JpaRepository<OrderedProductEn
       JOIN op.product p
       WHERE op.order.id = :orderId
       """)
-  List<OrderedProductDataObject> findAllByOrderId(@Param(value = "orderId") final UUID orderId);
+  List<OrderedProductProjection> findProjectionsByOrderId(@Param(value = "orderId") final UUID orderId);
+
+  @Query("""
+      SELECT op FROM OrderedProductEntity op
+      JOIN FETCH op.order o
+      JOIN FETCH op.product p
+      JOIN FETCH o.customer c
+      WHERE op.id IN :ids
+      """)
+  List<OrderedProductEntity> findAllById(@Param(value = "ids") List<OrderedProductEntityKey> ids);
 }

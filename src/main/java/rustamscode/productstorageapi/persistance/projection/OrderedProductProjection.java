@@ -1,4 +1,4 @@
-package rustamscode.productstorageapi.service.dto;
+package rustamscode.productstorageapi.persistance.projection;
 
 import lombok.Builder;
 import lombok.Value;
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Value
 @Builder
-public class OrderedProductDataObject {
+public class OrderedProductProjection {
   UUID productId;
   String name;
   BigDecimal amount;

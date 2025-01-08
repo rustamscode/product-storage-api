@@ -1,7 +1,7 @@
 package rustamscode.productstorageapi.motherobject;
 
 import lombok.Getter;
-import rustamscode.productstorageapi.service.dto.OrderedProductDataObject;
+import rustamscode.productstorageapi.persistance.projection.OrderedProductProjection;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -45,8 +45,8 @@ public class OrderedProductDataObjectBuilder {
     return this;
   }
 
-  public OrderedProductDataObject build() {
-    return OrderedProductDataObject.builder()
+  public OrderedProductProjection build() {
+    return OrderedProductProjection.builder()
         .productId(id)
         .name(name)
         .price(price)

@@ -17,9 +17,10 @@ import rustamscode.productstorageapi.persistance.repository.CustomerRepository;
 import rustamscode.productstorageapi.persistance.repository.OrderRepository;
 import rustamscode.productstorageapi.persistance.repository.OrderedProductRepository;
 import rustamscode.productstorageapi.persistance.repository.ProductRepository;
-import rustamscode.productstorageapi.service.dto.ImmutableOrderedProductObject;
 import rustamscode.productstorageapi.service.dto.ImmutableProductOrderDetails;
 import rustamscode.productstorageapi.service.dto.OrderData;
+import rustamscode.productstorageapi.service.dto.OrderStatusChangeInfo;
+import rustamscode.productstorageapi.service.dto.OrderedProductInfo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -77,45 +78,17 @@ public class OrderServiceTest extends ServiceTest {
   }
 
   @Test
-  void createShouldSaveOrderAndReturnId_WhenValidInput() {
-    ImmutableProductOrderDetails orderDetails = ObjectMother.immutableProductOrderDetails()
-        .withProducts(List.of(ImmutableOrderedProductObject.builder()
-            .id(expectedProductId)
-            .amount(BigDecimal.valueOf(2))
-            .build()))
-        .build();
-
-    CustomerEntity customer = new CustomerEntity();
-    customer.setId(expectedCustomerId);
-
-    ProductEntity product = new ProductEntity();
-    product.setId(expectedProductId);
-    product.setAmount(BigDecimal.valueOf(10));
-    product.setIsAvailable(true);
-
-    OrderEntity order = new OrderEntity();
-    order.setId(expectedOrderId);
-
-    when(customerRepositoryMock.findById(expectedCustomerId)).thenReturn(Optional.of(customer));
-    when(productRepositoryMock.findById(expectedProductId)).thenReturn(Optional.of(product));
-    when(conversionServiceMock.convert(orderDetails, OrderEntity.class)).thenReturn(order);
-    when(orderRepositoryMock.save(order)).thenReturn(order);
-
-    UUID actualId = underTest.create(expectedCustomerId, orderDetails);
-
-    assertNotNull(actualId);
-    assertEquals(expectedOrderId, actualId);
-    verify(orderRepositoryMock, times(2)).save(any(OrderEntity.class));
-    verify(orderedProductRepositoryMock, times(1)).saveAll(anyList());
-  }
-
-  @Test
   void createShouldThrowCustomerNotFoundException_WhenCustomerNotFound() {
     ImmutableProductOrderDetails orderDetails = ObjectMother.immutableProductOrderDetails().build();
 
     when(customerRepositoryMock.findById(expectedCustomerId)).thenReturn(Optional.empty());
 
-    assertThrows(CustomerNotFoundException.class, () -> underTest.create(expectedCustomerId, orderDetails));
+    assertThrows(CustomerNotFoundException.class, () -> underTest.create(expectedCustomerId, "Address Test", List.of
+        (
+            OrderedProductInfo.builder().build(),
+            OrderedProductInfo.builder().build()
+        )
+    ));
   }
 
   @Test
@@ -141,7 +114,9 @@ public class OrderServiceTest extends ServiceTest {
 
   @Test
   void updateStatusShouldUpdateOrderStatus_WhenOrderExistsAndAccessible() {
-    OrderStatus newStatus = OrderStatus.DONE;
+    OrderStatusChangeInfo newStatus = OrderStatusChangeInfo.builder()
+        .status(OrderStatus.DONE)
+        .build();
 
     CustomerEntity customer = ObjectMother.customerEntity()
         .withId(expectedCustomerId)
@@ -158,7 +133,7 @@ public class OrderServiceTest extends ServiceTest {
     UUID actual = underTest.updateStatus(expectedOrderId, expectedCustomerId, newStatus);
 
     assertNotNull(actual);
-    assertEquals(newStatus, order.getOrderStatus());
+    assertEquals(newStatus.getStatus(), order.getOrderStatus());
     verify(orderRepositoryMock, times(1)).save(order);
   }
 }

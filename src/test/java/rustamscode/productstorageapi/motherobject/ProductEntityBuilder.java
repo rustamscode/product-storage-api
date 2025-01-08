@@ -98,18 +98,18 @@ public class ProductEntityBuilder {
   }
 
   public ProductEntity build() {
-    return ProductEntity.builder()
-        .id(id)
-        .name(name)
-        .productNumber(productNumber)
-        .info(info)
-        .category(category)
-        .price(price)
-        .amount(amount)
-        .lastAmountUpdate(lastAmountUpdate)
-        .creationTime(creationTime)
-        .version(version)
-        .isAvailable(isAvailable)
-        .build();
+    return new ProductEntity(
+        id,
+        name,
+        productNumber,
+        info,
+        category,
+        price,
+        amount,
+        lastAmountUpdate,
+        creationTime,
+        version,
+        isAvailable
+    );
   }
 }
