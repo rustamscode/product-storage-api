@@ -58,10 +58,6 @@ public class ObjectMother {
     return OrderedProductDataObjectBuilder.getInstance();
   }
 
-  public static ImmutableProductOrderDetailsBuilder immutableProductOrderDetails() {
-    return ImmutableProductOrderDetailsBuilder.getInstance();
-  }
-
   public static ImmutableOrderedProductObjectBuilder immutableOrderedProductObject() {
     return ImmutableOrderedProductObjectBuilder.getInstance();
   }

@@ -208,13 +208,14 @@ public class OrderServiceImpl implements OrderService {
       throw new OrderAccessDeniedException(id, customerId);
     }
 
+    BigDecimal totalPrice = order.getOrderedProducts().stream()
+        .map(it -> it.getPrice().multiply(it.getAmount()))
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
     return OrderData.builder()
         .orderId(id)
         .orderedProducts(Optional.ofNullable(orderedProductRepository.findProjectionsByOrderId(id)).orElseThrow())
-        .totalPrice(order.getOrderedProducts().stream()
-            .map(it -> it.getPrice().multiply(it.getAmount()))
-            .reduce(BigDecimal.ZERO, BigDecimal::add)
-        )
+        .totalPrice(totalPrice)
         .build();
   }
 

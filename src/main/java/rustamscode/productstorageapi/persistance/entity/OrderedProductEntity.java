@@ -31,12 +31,10 @@ public class OrderedProductEntity {
 
   @ManyToOne()
   @MapsId("orderId")
-  @JoinColumn(name = "order_id", nullable = false)
   OrderEntity order;
 
   @ManyToOne()
   @MapsId("productId")
-  @JoinColumn(name = "product_id", nullable = false)
   ProductEntity product;
 
   @Column(name = "price", table = "ordered_product", nullable = false)

@@ -12,17 +12,14 @@ import rustamscode.productstorageapi.exception.CustomerNotFoundException;
 import rustamscode.productstorageapi.motherobject.ObjectMother;
 import rustamscode.productstorageapi.persistance.entity.CustomerEntity;
 import rustamscode.productstorageapi.persistance.entity.OrderEntity;
-import rustamscode.productstorageapi.persistance.entity.ProductEntity;
 import rustamscode.productstorageapi.persistance.repository.CustomerRepository;
 import rustamscode.productstorageapi.persistance.repository.OrderRepository;
 import rustamscode.productstorageapi.persistance.repository.OrderedProductRepository;
 import rustamscode.productstorageapi.persistance.repository.ProductRepository;
-import rustamscode.productstorageapi.service.dto.ImmutableProductOrderDetails;
 import rustamscode.productstorageapi.service.dto.OrderData;
 import rustamscode.productstorageapi.service.dto.OrderStatusChangeInfo;
 import rustamscode.productstorageapi.service.dto.OrderedProductInfo;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,8 +27,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -79,8 +74,6 @@ public class OrderServiceTest extends ServiceTest {
 
   @Test
   void createShouldThrowCustomerNotFoundException_WhenCustomerNotFound() {
-    ImmutableProductOrderDetails orderDetails = ObjectMother.immutableProductOrderDetails().build();
-
     when(customerRepositoryMock.findById(expectedCustomerId)).thenReturn(Optional.empty());
 
     assertThrows(CustomerNotFoundException.class, () -> underTest.create(expectedCustomerId, "Address Test", List.of
