@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import rustamscode.productstorageapi.exception.NonUniqueProductNumberException;
+import rustamscode.productstorageapi.exception.OrderAccessDeniedException;
 import rustamscode.productstorageapi.exception.ProductNotFoundException;
 import rustamscode.productstorageapi.exception.UnsupportedOperationTypeException;
 import rustamscode.productstorageapi.service.dto.ErrorDetails;
@@ -98,6 +99,18 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(HttpMessageNotReadableException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ErrorDetails httpMessageNotReadableException(Exception exception) {
+    log.error(exception.getMessage());
+
+    return ErrorDetails.builder()
+        .message(exception.getMessage())
+        .exception(exception.getClass().getSimpleName())
+        .source(exception.getStackTrace()[0].getClassName())
+        .build();
+  }
+
+  @ExceptionHandler(OrderAccessDeniedException.class)
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  public ErrorDetails orderAccessDeniedException(Exception exception) {
     log.error(exception.getMessage());
 
     return ErrorDetails.builder()

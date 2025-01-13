@@ -20,10 +20,9 @@ import java.util.UUID;
  * and is used for passing product data to controller layer.
  */
 
-
+@Getter
 @Setter
 @Builder
-@Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDataResponse {
   UUID id;

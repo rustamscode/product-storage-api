@@ -11,14 +11,15 @@ public class ImmutableProductCreateDetailsToProductConverter implements
 
   @Override
   public ProductEntity convert(ImmutableProductCreateDetails immutableProductCreateRequest) {
-    return ProductEntity.builder()
-        .name(immutableProductCreateRequest.getName())
-        .productNumber(immutableProductCreateRequest.getProductNumber())
-        .info(immutableProductCreateRequest.getInfo())
-        .category(immutableProductCreateRequest.getCategory())
-        .price(immutableProductCreateRequest.getPrice())
-        .amount(immutableProductCreateRequest.getAmount())
-        .lastAmountUpdate(immutableProductCreateRequest.getLastAmountUpdate())
-        .build();
+    ProductEntity product = new ProductEntity();
+    product.setName(immutableProductCreateRequest.getName());
+    product.setProductNumber(immutableProductCreateRequest.getProductNumber());
+    product.setInfo(immutableProductCreateRequest.getInfo());
+    product.setCategory(immutableProductCreateRequest.getCategory());
+    product.setPrice(immutableProductCreateRequest.getPrice());
+    product.setAmount(immutableProductCreateRequest.getAmount());
+    product.setLastAmountUpdate(immutableProductCreateRequest.getLastAmountUpdate());
+
+    return product;
   }
 }

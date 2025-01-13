@@ -103,6 +103,7 @@ public class ProductDataBuilder {
         .amount(amount)
         .lastAmountUpdate(lastAmountUpdate)
         .creationTime(creationTime)
+        .currency(currency)
         .build();
   }
 }

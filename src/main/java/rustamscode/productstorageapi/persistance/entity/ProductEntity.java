@@ -10,7 +10,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,11 +23,10 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Table(name = "products")
+@Table(name = "product")
 @Entity
 @Setter
 @Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -69,4 +67,7 @@ public class ProductEntity {
   @Version
   @Column(name = "version")
   Integer version;
+
+  @Column(name = "is_available", nullable = false)
+  Boolean isAvailable;
 }

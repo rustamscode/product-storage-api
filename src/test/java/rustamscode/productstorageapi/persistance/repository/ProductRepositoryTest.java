@@ -10,9 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
+import rustamscode.productstorageapi.enumeration.Category;
 import rustamscode.productstorageapi.motherobject.ObjectMother;
 import rustamscode.productstorageapi.persistance.entity.ProductEntity;
-import rustamscode.productstorageapi.enumeration.Category;
 import rustamscode.productstorageapi.search.criteria.BigDecimalSearchCriteria;
 import rustamscode.productstorageapi.search.criteria.SearchCriteria;
 import rustamscode.productstorageapi.search.criteria.StringSearchCriteria;
@@ -56,7 +56,7 @@ class ProductRepositoryTest extends RepositoryTest {
             .withName("Product3")
             .withProductNumber(BigInteger.valueOf(3333))
             .withPrice(BigDecimal.valueOf(3333))
-            .withCategory(Category.ELECTRONICS)
+           .withCategory(Category.ELECTRONICS)
             .build();
   }
 
