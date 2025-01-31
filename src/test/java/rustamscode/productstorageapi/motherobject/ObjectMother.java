@@ -33,4 +33,40 @@ public class ObjectMother {
   public static CurrencyRateDetailsBuilder currencyRateDetails() {
     return CurrencyRateDetailsBuilder.getInstance();
   }
+
+  public static OrderedProductRequestBuilder orderedProductRequest() {
+    return OrderedProductRequestBuilder.getInstance();
+  }
+
+  public static ProductOrderRequestBuilder productOrderRequest() {
+    return ProductOrderRequestBuilder.getInstance();
+  }
+
+  public static OrderedProductDataResponseBuilder orderedProductDataResponse() {
+    return OrderedProductDataResponseBuilder.getInstance();
+  }
+
+  public static OrderDataResponseBuilder orderDataResponse() {
+    return OrderDataResponseBuilder.getInstance();
+  }
+
+  public static OrderDataBuilder orderData() {
+    return OrderDataBuilder.getInstance();
+  }
+
+  public static OrderedProductDataObjectBuilder orderedProductDataObject() {
+    return OrderedProductDataObjectBuilder.getInstance();
+  }
+
+  public static ImmutableOrderedProductObjectBuilder immutableOrderedProductObject() {
+    return ImmutableOrderedProductObjectBuilder.getInstance();
+  }
+
+  public static CustomerEntityBuilder customerEntity() {
+    return CustomerEntityBuilder.getInstance();
+  }
+
+  public static OrderEntityBuilder orderEntity() {
+    return OrderEntityBuilder.getInstance();
+  }
 }

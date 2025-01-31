@@ -73,4 +73,3 @@ public class CurrencyConverterAdvice implements ResponseBodyAdvice<Object> {
     return page.map(response -> processResponse(response, currency, currencyRate));
   }
 }
-

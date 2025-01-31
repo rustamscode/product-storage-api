@@ -94,16 +94,17 @@ public class ProductDataResponseBuilder {
 
   public ProductDataResponse build() {
     return ProductDataResponse.builder()
-            .id(id)
-            .name(name)
-            .productNumber(productNumber)
-            .info(info)
-            .category(category)
-            .price(price)
-            .amount(amount)
-            .lastAmountUpdate(lastAmountUpdate)
-            .creationTime(creationTime)
-            .build();
+        .id(id)
+        .name(name)
+        .productNumber(productNumber)
+        .info(info)
+        .category(category)
+        .price(price)
+        .amount(amount)
+        .lastAmountUpdate(lastAmountUpdate)
+        .creationTime(creationTime)
+        .currency(currency)
+        .build();
   }
 
 }

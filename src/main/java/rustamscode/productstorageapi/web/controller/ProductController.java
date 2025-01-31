@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import rustamscode.productstorageapi.enumeration.Currency;
 import rustamscode.productstorageapi.search.criteria.SearchCriteria;
+import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
 import rustamscode.productstorageapi.web.dto.ProductDataResponse;
-import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 
 import java.util.List;
 import java.util.UUID;
