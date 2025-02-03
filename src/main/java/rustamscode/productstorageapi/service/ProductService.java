@@ -26,4 +26,6 @@ public interface ProductService {
   void delete(final UUID id);
 
   Page<ProductData> search(final Currency currency, Pageable pageable, List<SearchCriteria> criteriaList);
+
+  List<ProductData> deepSearch(final String key);
 }

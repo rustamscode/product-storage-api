@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Service class for product-management business logic.
@@ -175,5 +176,13 @@ public class ProductServiceImpl implements ProductService {
 
     return productRepository.findAll(specification, pageable)
         .map(product -> conversionService.convert(product, ProductData.class));
+  }
+
+  @Override
+  public List<ProductData> deepSearch(String key) {
+    return productRepository.deepSearch(key)
+        .stream()
+        .map(entity -> conversionService.convert(entity, ProductData.class))
+        .collect(Collectors.toList());
   }
 }
