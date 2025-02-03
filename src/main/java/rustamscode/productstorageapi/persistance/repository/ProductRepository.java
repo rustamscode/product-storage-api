@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import rustamscode.productstorageapi.persistance.entity.ProductEntity;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,9 +19,14 @@ public interface ProductRepository extends JpaRepository<ProductEntity, UUID>, J
   Optional<ProductEntity> findByProductNumber(final BigInteger productNumber);
 
   @Query(value = """
-      SELECT * FROM products
+      SELECT * FROM product
       WHERE id = :id
       FOR UPDATE;
       """, nativeQuery = true)
   Optional<ProductEntity> findByIdLocked(@Param("id") final UUID id);
+
+  @Query(value = """
+      SELECT * FROM product WHERE tsvector_column @@ websearch_to_tsquery('english', :key)
+      """, nativeQuery = true)
+  List<ProductEntity> deepSearch(@Param("key") final String key);
 }
