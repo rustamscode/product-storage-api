@@ -18,12 +18,13 @@ import rustamscode.productstorageapi.service.ProductService;
 import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
 import rustamscode.productstorageapi.service.dto.ProductData;
-import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
 import rustamscode.productstorageapi.web.dto.ProductDataResponse;
+import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Controller for managing products in the storage.
@@ -132,5 +133,13 @@ public class ProductControllerImpl implements ProductController {
     return productService
         .search(currency, pageable, criteriaList)
         .map(productData -> conversionService.convert(productData, ProductDataResponse.class));
+  }
+
+  @Override
+  public List<ProductDataResponse> deepSearch(final String key) {
+    return productService.deepSearch(key)
+        .stream()
+        .map(productData -> conversionService.convert(productData, ProductDataResponse.class))
+        .collect(Collectors.toList());
   }
 }

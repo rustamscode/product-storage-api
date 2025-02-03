@@ -3,6 +3,7 @@ package rustamscode.productstorageapi.web.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,12 +17,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import rustamscode.productstorageapi.enumeration.Currency;
 import rustamscode.productstorageapi.search.criteria.SearchCriteria;
-import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
 import rustamscode.productstorageapi.web.dto.ProductDataResponse;
+import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -60,4 +62,8 @@ public interface ProductController {
   Page<ProductDataResponse> search(@RequestHeader final Currency currency,
                                    @PageableDefault(sort = "name") final Pageable pageable,
                                    @Valid @RequestBody final List<SearchCriteria> criteriaList);
+
+  @GetMapping("/deepSearch")
+  @Operation(summary = "Full text search for products")
+  List<ProductDataResponse> deepSearch(@RequestParam("key") @NotBlank final String key);
 }
