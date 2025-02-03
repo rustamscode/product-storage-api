@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <include file="add-tsvector-column.xml" relativeToChangelogFile="true"/>
+    <include file="configure-tsvector-column.xml" relativeToChangelogFile="true"/>
+    <include file="create-product-tsvector-trigger-function.xml" relativeToChangelogFile="true"/>
+    <include file="create-product-tsvector-trigger.xml" relativeToChangelogFile="true"/>
+    <include file="add-product-tsvector-index.xml" relativeToChangelogFile="true"/>
+
+    <changeSet id="full-text-search" author="Rustamscode">
+        <tagDatabase tag="full-text-search"/>
+    </changeSet>
+</databaseChangeLog>

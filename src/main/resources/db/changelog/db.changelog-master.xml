@@ -7,6 +7,7 @@
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
 
     <include file="task-4/changelog.xml" relativeToChangelogFile="true"/>
+    <include file="full-text-search/changelog.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
 

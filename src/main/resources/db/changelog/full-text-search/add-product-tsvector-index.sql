@@ -1,0 +1,1 @@
+CREATE INDEX tsvector_idx ON product USING gin (tsvector_column);
