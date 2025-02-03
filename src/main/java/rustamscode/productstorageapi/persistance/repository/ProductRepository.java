@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import rustamscode.productstorageapi.persistance.entity.ProductEntity;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
@@ -24,9 +25,4 @@ public interface ProductRepository extends JpaRepository<ProductEntity, UUID>, J
       FOR UPDATE;
       """, nativeQuery = true)
   Optional<ProductEntity> findByIdLocked(@Param("id") final UUID id);
-
-  @Query(value = """
-      SELECT * FROM product WHERE tsvector_column @@ websearch_to_tsquery('english', :key)
-      """, nativeQuery = true)
-  List<ProductEntity> deepSearch(@Param("key") final String key);
 }

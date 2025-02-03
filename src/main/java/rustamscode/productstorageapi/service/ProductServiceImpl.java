@@ -8,6 +8,8 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import rustamscode.productstorageapi.enumeration.Currency;
@@ -21,11 +23,15 @@ import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
 import rustamscode.productstorageapi.service.dto.ProductData;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Service class for product-management business logic.
@@ -48,6 +54,12 @@ public class ProductServiceImpl implements ProductService {
    * Service for converting between DTOs and entity objects.
    */
   final ConversionService conversionService;
+
+  final JdbcTemplate jdbc;
+
+  final String baseQuery = """
+      SELECT * FROM product WHERE TRUE
+      """;
 
   /**
    * Creates a new product based on the provided details.
@@ -179,10 +191,25 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public List<ProductData> deepSearch(String key) {
-    return productRepository.deepSearch(key)
+  public List<ProductData> deepSearch(final String key, final BigDecimal maxPrice) {
+    StringBuilder sb = new StringBuilder(baseQuery); // No filter query
+    List<Object> params = new ArrayList<>();
+
+    Optional.ofNullable(maxPrice).ifPresent(p -> {
+      sb.append(" AND product.price < ?");
+      params.add(maxPrice);
+    });
+
+    if (key != null) {
+      String dividedKey = String.join("<->", key.split(" "));
+
+      sb.append(" AND tsvector_column @@ to_tsquery('english', ?)");
+      params.add(dividedKey);
+    }
+
+    return jdbc.query(sb.toString(), params.toArray(), new BeanPropertyRowMapper<>(ProductEntity.class))
         .stream()
         .map(entity -> conversionService.convert(entity, ProductData.class))
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 }

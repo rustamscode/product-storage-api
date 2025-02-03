@@ -3,6 +3,7 @@ package rustamscode.productstorageapi.web.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
 import rustamscode.productstorageapi.web.dto.ProductDataResponse;
 import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,5 +67,6 @@ public interface ProductController {
 
   @GetMapping("/deepSearch")
   @Operation(summary = "Full text search for products")
-  List<ProductDataResponse> deepSearch(@RequestParam("key") @NotBlank final String key);
+  List<ProductDataResponse> deepSearch(@RequestParam(value = "key", required = false) final String key,
+                                       @RequestParam(value = "maxPrice", required = false) final BigDecimal maxPrice);
 }

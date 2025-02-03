@@ -22,6 +22,7 @@ import rustamscode.productstorageapi.web.dto.ProductCreateRequest;
 import rustamscode.productstorageapi.web.dto.ProductDataResponse;
 import rustamscode.productstorageapi.web.dto.ProductUpdateRequest;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -136,8 +137,9 @@ public class ProductControllerImpl implements ProductController {
   }
 
   @Override
-  public List<ProductDataResponse> deepSearch(final String key) {
-    return productService.deepSearch(key)
+  public List<ProductDataResponse> deepSearch(final String key,
+                                              final BigDecimal maxPrice) {
+    return productService.deepSearch(key, maxPrice)
         .stream()
         .map(productData -> conversionService.convert(productData, ProductDataResponse.class))
         .collect(Collectors.toList());

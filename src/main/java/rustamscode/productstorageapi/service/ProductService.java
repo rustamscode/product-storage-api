@@ -10,6 +10,7 @@ import rustamscode.productstorageapi.service.dto.ImmutableProductCreateDetails;
 import rustamscode.productstorageapi.service.dto.ImmutableProductUpdateDetails;
 import rustamscode.productstorageapi.service.dto.ProductData;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,5 +28,5 @@ public interface ProductService {
 
   Page<ProductData> search(final Currency currency, Pageable pageable, List<SearchCriteria> criteriaList);
 
-  List<ProductData> deepSearch(final String key);
+  List<ProductData> deepSearch(final String key, final BigDecimal maxPrice);
 }
